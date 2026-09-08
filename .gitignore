@@ -2,3 +2,6 @@
 *.bak
 _shot.html
 node_modules/
+_diag*.html
+_autoshot.html
+_shot*.html

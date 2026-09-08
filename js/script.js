@@ -56,6 +56,9 @@ window.SCRIPT = [
   { t: 'say', who: 'salt', emo: 'surprise', text: '！' },
   { t: 'say', who: 'mark', text: '你不在任何名册上。' },
   { t: 'say', who: 'mark', text: '灯塔上有三千一百二十七个活人，每一个的编号我都背得出来。<span class="rd">你不是其中之一。</span>' },
+  /* ---- 探索模式接入点：第一视角遇到马克之后，从这里接回正片 ---- */
+  { t: 'label', v: 'explore_join' },
+
   { t: 'say', who: 'narr', text: '他没有拔刀。但他站的位置，正好堵死了你身后唯一的岔路。' },
   { t: 'say', who: 'mark', text: '报上来历。给你一次机会。' },
 

@@ -102,11 +102,11 @@
     </div>
   </div>
 
-  <!-- ========== 探索模式（画中世界 · 沉浸穿越，移动端优先） ========== -->
+  <!-- ========== 探索模式（第一视角沉浸推进，移动端优先） ========== -->
   <div id="explore" aria-hidden="true">
     <div class="ex-view" id="exView">
 
-      <!-- 阶段0：穿越炫光 -->
+      <!-- 阶段0：穿越炫光（一闪而过） -->
       <div class="ex-phase ex-warp" id="exWarp">
         <div class="warp-rays"></div>
         <div class="warp-core"></div>
@@ -114,67 +114,63 @@
         <div class="warp-tip">穿 越 中<span>SYNCHRONISING…</span></div>
       </div>
 
-      <!-- 阶段1：第一视角看手 -->
+      <!-- 阶段1+2：第一视角长廊（抬手惊讶 → 往前推进） -->
       <div class="ex-phase ex-fpv" id="exFpv">
-        <div class="fpv-bg"></div>
-        <div class="fpv-fog"></div>
+
+        <!-- 摄影机：走路晃动 -->
+        <div class="fpv-cam" id="exCam">
+          <div class="cor-l" id="exCor"></div>
+          <div class="cor-fog"></div>
+
+          <!-- 纵深物件：手电照亮的墙面刻痕 -->
+          <div class="dep glyph" id="exGlyph"><span>✷</span></div>
+
+          <!-- 纵深物件：马克全身（伪 Live2D） -->
+          <div class="dep mk" id="exMark">
+            <i class="mk-ground"></i>
+            <div class="mk-rig">
+              <img class="mk-body" src="assets/char/mark_body.png" alt="马克">
+              <div class="mk-head" id="exMkHead">
+                <img src="assets/char/mark_head.png" alt="">
+                <i class="mk-lid mk-lidL"></i>
+                <i class="mk-lid mk-lidR"></i>
+              </div>
+              <div class="mk-glow"></div>
+              <div class="mk-rim"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 第一视角双手（自己的手，仅抬手阶段出现） -->
         <div class="fpv-hands" id="exHands"></div>
+        <div class="torch" id="exTorch"></div>
         <div class="fpv-vig"></div>
       </div>
 
-      <!-- 阶段2：伪3D建模 -->
-      <div class="ex-phase ex-build" id="exBuild">
-        <div class="build-grid"></div>
-        <div class="build-char" id="exBuildChar">
-          <img src="assets/oc/title_char.png" alt="Salt">
-          <div class="build-scan"></div>
-        </div>
-        <div class="build-ring"></div>
-      </div>
-
-      <!-- 阶段3：第三视角跑动 -->
-      <div class="ex-phase ex-run" id="exRun">
-        <div class="run-far" id="exRunFar"></div>
-        <div class="run-mid" id="exRunMid"></div>
-        <div class="run-ground"></div>
-        <div class="run-world" id="exRunWorld"></div>
-        <div class="run-fg" id="exRunFg"></div>
-        <div class="ex-salt" id="exSalt">
-          <div class="ex-salt-in">
-            <img class="es-body" src="assets/oc/body.png" alt="Salt">
-            <img class="es-glow" src="assets/oc/glow.png" alt="">
-            <img class="es-head" src="assets/oc/head_idle.png" alt="">
-          </div>
-          <div class="ex-shadow"></div>
-        </div>
-        <div class="torch" id="exTorch"></div>
-      </div>
-
-      <div class="ex-vig"></div>
       <div class="ex-grain"></div>
     </div>
 
     <div class="ex-frame"></div>
 
     <div class="ex-top">
-      <div class="ex-chip"><b>EXPLORE</b><span id="exChipSub">画中世界 · 步入灯塔</span></div>
+      <div class="ex-chip"><b>EXPLORE</b><span id="exChipSub">生态区 · 三号回廊</span></div>
       <button class="ex-exit" id="exExit"><b>◂ TITLE</b><span>返回标题</span></button>
     </div>
 
     <!-- 字幕 / 自白 / 对话 -->
     <div class="ex-caption" id="exCaption">
-      <i id="exCapName"></i>
+      <i id="exCapWho"></i>
       <p id="exCapTxt"></p>
       <span class="cap-next" id="exCapNext">▸ 轻触继续</span>
     </div>
 
-    <!-- 马克头顶提示 -->
+    <!-- 马克提示 -->
     <div class="ex-prompt" id="exPrompt"></div>
 
-    <!-- 底部控制条（跑动阶段） -->
+    <!-- 底部控制条 -->
     <div class="ex-ctrl" id="exCtrl">
-      <button class="ex-torch-btn" id="exTorchBtn"><b>🔦</b><span>手电筒</span></button>
-      <button class="ex-run-btn" id="exRunBtn"><b id="exRunIcon">▶▶</b><span id="exRunLabel">按住前进</span></button>
+      <button class="ex-torch-btn" id="exTorchBtn"><b>☀︎</b><span>手电</span></button>
+      <button class="ex-run-btn" id="exRunBtn"><b id="exRunLab">前进</b><span id="exRunSub">按住向前走</span></button>
     </div>
 
     <div class="ex-hint" id="exHint"></div>

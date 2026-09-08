@@ -341,7 +341,23 @@
     els.ctrl.classList.add('on');
   }
 
-  async function startNew(skipIntro) {
+  // 静默铺好某个接入点之前的舞台状态（背景 / 立绘 / 章节 / HUD / flag），
+  // 只做"状态"节点，不播台词与特效 —— 用于探索模式结束后无缝接回正片。
+  function primeUpTo(idx) {
+    for (let k = 0; k < idx; k++) {
+      const n = window.SCRIPT[k];
+      if (!n) continue;
+      if (n.t === 'bg') setBg(n.v);
+      else if (n.t === 'char') setChar(n.v, n.dim);
+      else if (n.t === 'chap') setChapter(n);
+      else if (n.t === 'hud') setHud(n);
+      else if (n.t === 'flag') S.flags[n.k] = n.v;
+    }
+    els.hud.classList.add('on');
+    window.Rig.named(true);
+  }
+
+  async function startNew(skipIntro, joinLabel) {
     // 开场动画：OC 穿越
     if (!skipIntro && window.Intro) {
       els.title.classList.add('off');
@@ -353,6 +369,10 @@
     setChar(null);
     window.Rig.emo('idle'); window.Rig.named(false);
     els.vSync.innerHTML = '34<em>%</em>'; els.vBpm.textContent = '72';
+    if (joinLabel) {
+      const j = findLabel(joinLabel);
+      if (j >= 0) { primeUpTo(j); S.i = j; }
+    }
     // 正片场景已铺好，白光多停留一会，再带眩晕感淡出：游戏从刺眼白光里晃着浮现
     const wo = document.getElementById('whiteout');
     if (wo && wo.classList.contains('hold')) {
@@ -489,5 +509,7 @@
     window.__showTitle = showTitle;
     window.__hideTitle = hideTitle;
     window.__startStory = () => startNew(true);   // 从探索直接进正片（跳过开场视频）
+    // 从探索模式的"第一视角遇见马克"接回正片：跳过序章里与探索重复的段落
+    window.__startStoryAt = (label) => startNew(true, label);
   });
 })();
