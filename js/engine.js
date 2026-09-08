@@ -231,6 +231,22 @@
 
       case 'label': break;
 
+      // 第一视角探索段：交给 explore.js 接管画面，跑完再回来继续正片
+      case 'explore': {
+        clearTimers();
+        S.typing = false; waiter = null;
+        els.dialogue.classList.remove('on');
+        els.choices.classList.remove('on');
+        els.ctrl.classList.remove('on');
+        els.hud.classList.remove('on');
+        const wo = document.getElementById('whiteout');
+        if (wo) wo.classList.remove('hold', 'fade');
+        if (els.stage) els.stage.classList.remove('dizzy');
+        if (window.Explore) await window.Explore.playInStory();
+        els.ctrl.classList.add('on');
+        break;
+      }
+
       case 'goto': { const j = findLabel(n.v); if (j >= 0) S.i = j; break; }
 
       case 'fx': {
@@ -440,7 +456,6 @@
       const m = li.dataset.menu;
       if (m === 'start') startNew();
       if (m === 'continue') startContinue();
-      if (m === 'explore') { if (window.Explore) window.Explore.start(); }
       if (m === 'about') els.about.classList.add('on');
     }
 
@@ -485,8 +500,7 @@
         const m = li.dataset.menu;
         if (m === 'start') startNew();
         if (m === 'continue') startContinue();
-        if (m === 'explore') { if (window.Explore) window.Explore.start(); }
-        if (m === 'about') els.about.classList.add('on');
+          if (m === 'about') els.about.classList.add('on');
       });
     });
     document.querySelector('.ab-close').addEventListener('click', () => els.about.classList.remove('on'));

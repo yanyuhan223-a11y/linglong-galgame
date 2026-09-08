@@ -91,7 +91,7 @@
 .dep{position:absolute;left:50%;bottom:44%;height:8vh;z-index:5;
   transform:translateX(-50%);transform-origin:50% 100%;
   opacity:0;will-change:transform,height,bottom,opacity}
-.dep.mk{aspect-ratio:497/1458}
+.dep.mk{aspect-ratio:612/2096}
 
 /* 手电照亮的墙面刻痕 */
 .dep.glyph{align-items:center;justify-content:center;display:flex}
@@ -115,35 +115,47 @@
 .mk-body{height:100%;width:100%;display:block;
   filter:drop-shadow(0 10px 26px rgba(0,0,0,.75))}
 
-/* 头部独立微动（Live2D 灵魂） */
-.mk-head{position:absolute;left:35.412%;top:0;width:49.899%;height:16.187%;
-  transform-origin:50% 96%;animation:mkHead 5.4s ease-in-out infinite}
+/* 头部独立微动（Live2D 灵魂）—— 坐标对应 mark_head.png（612x2096 全身图上 178,0,404,262） */
+.mk-head{position:absolute;left:29.085%;top:0;width:36.928%;height:12.500%;
+  transform-origin:50% 97%;animation:mkHead 5.4s ease-in-out infinite}
 .mk-head img{width:100%;height:100%;display:block}
 @keyframes mkHead{
-  0%,100%{transform:rotate(-.55deg) translate(-.3%,0)}
-  35%{transform:rotate(.3deg) translate(.25%,-.35%)}
-  70%{transform:rotate(.6deg) translate(.35%,.12%)}}
+  0%,100%{transform:rotate(-.5deg) translate(-.25%,0)}
+  35%{transform:rotate(.28deg) translate(.22%,-.3%)}
+  70%{transform:rotate(.55deg) translate(.3%,.1%)}}
 /* 说话时点头 */
 .mk-head.nod{animation:mkNod .55s ease-out}
 @keyframes mkNod{0%{transform:rotate(0) translateY(0)}
   40%{transform:rotate(1deg) translateY(1.5%)}
   100%{transform:rotate(0) translateY(0)}}
 
-/* 眨眼：用角色自身肤色做贴合眼睑，scaleY 由 0 展开到 1 */
-.mk-lid{position:absolute;display:block;transform:scaleY(0);transform-origin:50% 0;
-  border-radius:38% 38% 48% 48%/52% 52% 44% 44%;filter:blur(.4px);
+/* 眨眼：用角色自身肤色做贴合眼睑，scaleY 由 0 展开到 1（眼睛在头图上是斜的，跟着倾 -7deg） */
+.mk-lid{position:absolute;display:block;transform:rotate(-7deg) scaleY(0);transform-origin:50% 0;
+  border-radius:38% 38% 48% 48%/52% 52% 44% 44%;filter:blur(.45px);
   animation:mkBlink 5.2s ease-in-out infinite}
 .mk-lid::after{content:"";position:absolute;left:5%;right:5%;bottom:0;height:16%;
-  background:rgba(58,32,22,.78);border-radius:50%;filter:blur(.3px)}
-.mk-lidL{left:18.55%;top:47.88%;width:14.52%;height:6.78%;
-  background:linear-gradient(180deg,#c08a6e 0%,#b1806a 62%,#a0725e 100%)}
-.mk-lidR{left:38.71%;top:47.03%;width:14.11%;height:6.36%;
-  background:linear-gradient(180deg,#a87a64 0%,#966b58 62%,#8a6250 100%)}
-@keyframes mkBlink{0%,93%{transform:scaleY(0)}95.5%,96.8%{transform:scaleY(1)}100%{transform:scaleY(0)}}
+  background:rgba(52,28,20,.72);border-radius:50%;filter:blur(.3px)}
+/* 画面左侧那只眼（他的右眼）在阴影里，色调更沉 */
+.mk-lidL{left:24.78%;top:61.83%;width:13.72%;height:8.78%;
+  background:linear-gradient(180deg,#a97e69 0%,#9a7160 60%,#8c6555 100%)}
+.mk-lidR{left:47.35%;top:58.78%;width:16.81%;height:9.16%;
+  background:linear-gradient(180deg,#bb8b74 0%,#ab7d67 60%,#9d7360 100%)}
+@keyframes mkBlink{0%,93%{transform:rotate(-7deg) scaleY(0)}
+  95.5%,96.8%{transform:rotate(-7deg) scaleY(1)}
+  100%{transform:rotate(-7deg) scaleY(0)}}
 
-/* 装甲橙色呼吸光（用剪影做遮罩，整体透出暖光） */
+/* 「察觉到你」：装甲灯骤亮 + 头转过来（远处发现你的那一下） */
+.mk-rig.alert .mk-head{animation:mkNotice 1.5s cubic-bezier(.3,.7,.2,1) forwards}
+@keyframes mkNotice{
+  0%{transform:rotate(-.5deg) translate(-.25%,0)}
+  38%{transform:rotate(1.8deg) translate(1.1%,-.5%)}
+  100%{transform:rotate(1.1deg) translate(.7%,-.2%)}}
+.mk-rig.alert .mk-glow{animation:mkAlert 1.5s ease-out}
+@keyframes mkAlert{0%{opacity:.35}22%{opacity:1}55%{opacity:.5}78%{opacity:1}100%{opacity:.7}}
+
+/* 装甲橙色呼吸光（用剪影做遮罩，只烘胸甲/腰间那几条指示灯的位置） */
 .mk-glow{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
-  background:radial-gradient(60% 46% at 50% 42%,rgba(255,150,50,.5),transparent 72%);
+  background:radial-gradient(44% 15% at 50% 23%,rgba(255,150,50,.5),transparent 74%);
   -webkit-mask-image:url("../assets/char/mark_body.png");
           mask-image:url("../assets/char/mark_body.png");
   -webkit-mask-size:100% 100%;mask-size:100% 100%;
@@ -152,9 +164,10 @@
   animation:mkGlow 2.8s ease-in-out infinite}
 @keyframes mkGlow{0%,100%{opacity:.35}50%{opacity:.85}}
 
-/* 环境冷调边缘光：让他融进长廊的青紫环境里 */
-.mk-rim{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;
-  background:linear-gradient(196deg,rgba(140,225,255,.5) 0%,rgba(140,225,255,.16) 26%,transparent 46%);
+/* 环境冷调边缘光：只压在头顶/肩线那一线，绝不能把黑发和脸洗白 */
+.mk-rim{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:.75;
+  background:linear-gradient(198deg,rgba(150,225,255,.30) 0%,rgba(150,225,255,.10) 5.5%,
+             rgba(150,225,255,.03) 11%,transparent 17%);
   -webkit-mask-image:url("../assets/char/mark_body.png");
           mask-image:url("../assets/char/mark_body.png");
   -webkit-mask-size:100% 100%;mask-size:100% 100%;
@@ -209,33 +222,75 @@
 .cap-next{display:block;text-align:right;margin-top:6px;font-size:11px;letter-spacing:.1em;
   color:rgba(244,242,236,.75);font-family:var(--mono)}
 
-.ex-prompt{position:absolute;left:50%;top:16%;transform:translate(-50%,10px);z-index:13;
+.ex-prompt{position:absolute;left:50%;top:8.5%;transform:translate(-50%,10px);z-index:13;
   opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
   background:var(--paper);color:var(--ink);padding:7px 14px;border-radius:2px;font-weight:800;
   white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .ex-prompt.on{opacity:1;transform:translate(-50%,0)}
 .ex-prompt b{color:var(--violet-d)}
 
-/* 底部控制 */
+/* ============================================================
+   底部控制：左下虚拟摇杆 + 右下手电
+   ============================================================ */
 .ex-ctrl{position:absolute;left:0;right:0;bottom:0;z-index:16;
-  display:none;justify-content:center;align-items:flex-end;gap:16px;
-  padding:0 20px calc(22px + env(safe-area-inset-bottom));pointer-events:none}
+  display:none;justify-content:space-between;align-items:flex-end;gap:12px;
+  padding:0 22px calc(24px + env(safe-area-inset-bottom));pointer-events:none;
+  transition:opacity .28s}
 .ex-ctrl.on{display:flex}
-.ex-torch-btn,.ex-run-btn{pointer-events:auto;user-select:none;color:#fff;
+/* 台词展开时摇杆压暗并让点击穿透到画面（点哪里都能推进台词） */
+.ex-ctrl.locked{opacity:.22;pointer-events:none !important}
+
+/* ---------- 虚拟摇杆 ---------- */
+.ex-stick{position:relative;width:132px;height:132px;flex:0 0 auto;
+  pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none;
+  display:flex;align-items:center;justify-content:center}
+/* 底盘 */
+.st-base{position:absolute;left:50%;top:50%;width:112px;height:112px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle at 50% 42%,rgba(24,24,38,.7),rgba(8,9,16,.78));
+  box-shadow:inset 0 0 0 2px rgba(168,85,247,.42),inset 0 6px 22px rgba(0,0,0,.7),
+             0 8px 22px rgba(0,0,0,.5);
+  backdrop-filter:blur(5px)}
+/* 底盘刻度：四个方向的小三角，上方那个高亮（提示往前推） */
+.st-base::before,.st-base::after{content:"";position:absolute;left:50%;
+  border:5px solid transparent}
+.st-base::before{top:7px;transform:translateX(-50%);border-bottom-color:rgba(34,211,238,.85)}
+.st-base::after{bottom:7px;transform:translateX(-50%);border-top-color:rgba(244,242,236,.22)}
+/* 摇杆帽 */
+.st-knob{position:absolute;left:50%;top:50%;width:56px;height:56px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle at 46% 34%,#f4f2ec 0%,#c8c6d6 38%,#6d6a84 78%,#3a3850 100%);
+  box-shadow:0 4px 14px rgba(0,0,0,.7),inset 0 -3px 8px rgba(0,0,0,.4),
+             0 0 0 2px rgba(6,7,12,.8);
+  transition:box-shadow .18s}
+.st-knob::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;
+  transform:translate(-50%,-50%);border-radius:50%;background:rgba(34,211,238,.5)}
+.ex-stick.act .st-knob{box-shadow:0 4px 14px rgba(0,0,0,.7),
+  0 0 20px rgba(34,211,238,.75),0 0 0 2px rgba(34,211,238,.7)}
+/* 空闲时轻轻上下浮动提示"往前推" */
+.ex-stick.idle .st-knob{animation:stHint 1.9s ease-in-out infinite}
+@keyframes stHint{0%,100%{margin-top:0}50%{margin-top:-7px}}
+/* 前进力度环 */
+.st-ring{position:absolute;left:50%;top:50%;width:112px;height:112px;
+  transform:translate(-50%,-50%) rotate(-90deg);border-radius:50%;pointer-events:none;
+  background:conic-gradient(rgba(34,211,238,.85) calc(var(--pw,0)*1turn),transparent 0);
+  -webkit-mask:radial-gradient(circle,transparent 0 46px,#000 46px 54px,transparent 54px);
+          mask:radial-gradient(circle,transparent 0 46px,#000 46px 54px,transparent 54px);
+  opacity:.9}
+.st-lab{position:absolute;left:50%;bottom:5px;transform:translateX(-50%);white-space:nowrap;
+  font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:rgba(244,242,236,.6)}
+
+/* ---------- 手电 ---------- */
+.ex-torch-btn{pointer-events:auto;user-select:none;color:#fff;flex:0 0 auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   border:2px solid rgba(168,85,247,.5);background:rgba(16,16,26,.62);backdrop-filter:blur(4px);
-  box-shadow:0 6px 18px rgba(0,0,0,.45);transition:transform .1s,background .18s,border-color .18s}
-.ex-torch-btn{width:66px;height:66px;border-radius:50%}
+  box-shadow:0 6px 18px rgba(0,0,0,.45);transition:transform .1s,background .18s,border-color .18s;
+  width:66px;height:66px;border-radius:50%;margin-bottom:22px}
 .ex-torch-btn b{font-size:24px;line-height:1}
 .ex-torch-btn span{font-size:9px;letter-spacing:.04em;opacity:.85}
+.ex-torch-btn:active{transform:scale(.94)}
 .ex-torch-btn.on{border-color:var(--cyan);background:rgba(34,211,238,.22);
   box-shadow:0 0 22px rgba(34,211,238,.5)}
-.ex-run-btn{min-width:180px;height:66px;border-radius:36px;border-color:rgba(34,211,238,.6)}
-.ex-run-btn b{font-family:var(--disp);font-size:20px;letter-spacing:.12em;color:var(--cyan)}
-.ex-run-btn span{font-size:10px;letter-spacing:.08em;opacity:.85}
-.ex-run-btn:active{transform:scale(.96);background:rgba(34,211,238,.16)}
-.ex-run-btn.pulse{animation:runPulse 1.3s ease-in-out infinite}
-@keyframes runPulse{0%,100%{box-shadow:0 6px 18px rgba(0,0,0,.45)}50%{box-shadow:0 0 26px rgba(34,211,238,.6)}}
 
 .ex-hint{position:absolute;left:50%;bottom:calc(100px + env(safe-area-inset-bottom));transform:translateX(-50%);
   z-index:13;font-size:11.5px;line-height:1.55;letter-spacing:.05em;color:rgba(244,242,236,.78);text-align:center;
@@ -246,16 +301,52 @@
 .ex-hint:empty{display:none}
 .ex-hint.hide{opacity:0;visibility:hidden}
 
-/* 自白阶段（无底部按钮）字幕下移，避免下方大片空黑 */
+/* 自白阶段（无底部摇杆）字幕下移，避免下方大片空黑 */
 #explore:not(.walking) .ex-caption{bottom:calc(46px + env(safe-area-inset-bottom))}
 
+/* 正片内嵌模式：不显示"返回标题"（探索是剧情的一段，不该能中途跳出去） */
+#explore.instory .ex-exit{display:none}
+
+/* 探索段落收尾：整层淡出，交回正片 */
+#explore.ex-out{animation:exOut .8s ease-in forwards}
+@keyframes exOut{0%{opacity:1}100%{opacity:0}}
+
+/* 正片内嵌：睁眼时视线从模糊里恢复（替代穿越炫光，避免和开场视频重复） */
+.ex-fpv.recover .fpv-cam{animation:exRecover 2.6s cubic-bezier(.25,.8,.3,1) forwards}
+@keyframes exRecover{
+  0%{filter:blur(22px) brightness(2.6) saturate(.2);transform:scale(1.16)}
+  30%{filter:blur(11px) brightness(1.5) saturate(.6)}
+  100%{filter:blur(0) brightness(1) saturate(1);transform:scale(1.05)}}
+
+/* 手上淡淡的光（"为什么我的手在发光"） */
+.fpv-hands::after{content:"";position:absolute;inset:0;opacity:0;pointer-events:none;
+  background:radial-gradient(38% 26% at 50% 78%,rgba(190,150,255,.75),transparent 70%);
+  mix-blend-mode:screen;transition:opacity .8s}
+.fpv-hands.glow::after{opacity:1;animation:handGlow 2.4s ease-in-out infinite}
+@keyframes handGlow{0%,100%{opacity:.45}50%{opacity:1}}
+
 @media (min-width:860px){
-  .ex-caption{bottom:120px}
+  .ex-caption{bottom:150px}
   #explore:not(.walking) .ex-caption{bottom:52px}
+  .ex-ctrl{padding-left:40px;padding-right:40px}
 }
 @media (max-width:420px){
   .ex-chip b{font-size:13px}
   .ex-chip span{font-size:9px}
-  .ex-run-btn{min-width:150px;height:60px}
-  .ex-torch-btn{width:60px;height:60px}
+  .ex-stick{width:118px;height:118px}
+  .st-base,.st-ring{width:100px;height:100px}
+  .st-knob{width:50px;height:50px}
+  .st-ring{-webkit-mask:radial-gradient(circle,transparent 0 41px,#000 41px 48px,transparent 48px);
+           mask:radial-gradient(circle,transparent 0 41px,#000 41px 48px,transparent 48px)}
+  .ex-torch-btn{width:58px;height:58px;margin-bottom:20px}
+  .ex-caption{bottom:calc(160px + env(safe-area-inset-bottom))}
+}
+/* 矮屏（横屏手机等）：摇杆缩一点，别把画面吃掉 */
+@media (max-height:520px){
+  .ex-stick{width:100px;height:100px}
+  .st-base,.st-ring{width:88px;height:88px}
+  .st-knob{width:44px;height:44px}
+  .st-ring{-webkit-mask:radial-gradient(circle,transparent 0 36px,#000 36px 42px,transparent 42px);
+           mask:radial-gradient(circle,transparent 0 36px,#000 36px 42px,transparent 42px)}
+  .ex-caption{bottom:calc(118px + env(safe-area-inset-bottom))}
 }

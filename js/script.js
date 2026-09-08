@@ -30,35 +30,19 @@ window.SCRIPT = [
   { t: 'fx', do: 'shake', arg: 'm' },
   { t: 'wait', ms: 700 },
   { t: 'fx', do: 'flash', arg: 'vio' },
+
+  /* ---- 第一视角探索段（穿插在正片里，不是另一个入口）：
+         在灯塔回廊里睁眼 → 抬手 → 推摇杆慢慢往前走 → 在尽头遇见马克 ---- */
+  { t: 'explore' },
+
+  /* ---- 探索结束：舞台切回正片，马克已经站在你面前 ---- */
   { t: 'bg', v: 'tower' },
   { t: 'hud', on: true, sync: 34, bpm: 72, ticker: 'calm' },
-  { t: 'wait', ms: 400 },
-
-  { t: 'say', who: 'narr', text: '再睁眼，是金属的味道。' },
-  { t: 'say', who: 'salt', emo: 'surprise', text: '……这不是我的房间。' },
-  { t: 'say', who: 'salt', emo: 'surprise', text: '墙是铁的，地也是铁的。空气里是铁锈和消毒水混在一起的味道，冷得发苦。' },
-  { t: 'say', who: 'narr', text: '脚下的格栅在震。不是地震那种震——是某种极大的东西，正托着你悬在半空。' },
-
-  { t: 'fx', do: 'charge', arg: true },
-  { t: 'say', who: 'salt', emo: 'fear', text: '而且——为什么我的手<span class="hl">在发光</span>？' },
-  { t: 'wait', ms: 500 },
-  { t: 'fx', do: 'charge', arg: false },
-
-  { t: 'say', who: 'sys', text: '灯塔广播：全体尘民注意。A-7 区已封锁，基因编码核验中。<span class="rd">无编码者将被视作污染源处理。</span>' },
-  { t: 'say', who: 'salt', emo: 'fear', text: '尘民？基因编码？……污染源？' },
-  { t: 'say', who: 'narr', text: '走廊尽头传来靴底敲击钢板的声音。一下，两下。不急——但每一下都在收紧。' },
-
-  /* ---- 马克登场 ---- */
-  { t: 'fx', do: 'speed' },
-  { t: 'fx', do: 'shake', arg: 's' },
   { t: 'char', v: 'mark' },
-  { t: 'say', who: 'mark', text: '站住。' },
-  { t: 'say', who: 'salt', emo: 'surprise', text: '！' },
-  { t: 'say', who: 'mark', text: '你不在任何名册上。' },
-  { t: 'say', who: 'mark', text: '灯塔上有三千一百二十七个活人，每一个的编号我都背得出来。<span class="rd">你不是其中之一。</span>' },
-  /* ---- 探索模式接入点：第一视角遇到马克之后，从这里接回正片 ---- */
+  { t: 'wait', ms: 500 },
   { t: 'label', v: 'explore_join' },
 
+  { t: 'say', who: 'salt', emo: 'fear', text: '（三千一百二十七个……他连这个都记得。那我算什么？）' },
   { t: 'say', who: 'narr', text: '他没有拔刀。但他站的位置，正好堵死了你身后唯一的岔路。' },
   { t: 'say', who: 'mark', text: '报上来历。给你一次机会。' },
 
