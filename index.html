@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>笼中异色 · CHROMA IN THE CAGE</title>
+<meta name="description" content="《灵笼》同人视觉小说 · OC 穿越 Demo">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/fx.css">
+<link rel="stylesheet" href="css/intro.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ========== 舞台 ========== -->
+  <div id="stage">
+
+    <div id="bgLayer">
+      <div class="bg" id="bgA"></div>
+      <div class="bg" id="bgB"></div>
+      <div id="bgTint"></div>
+    </div>
+
+    <canvas id="fxCanvas"></canvas>
+
+    <!-- 《灵笼》角色立绘（右） -->
+    <div id="charLayer">
+      <img id="charImg" alt="">
+    </div>
+
+    <!-- ===== OC 伪 Live2D 装置（左侧固定） ===== -->
+    <div id="ocRig" class="rig">
+      <div class="rig-inner">
+        <div class="rig-shadow"></div>
+        <img class="oc-body" src="assets/oc/body.png" alt="Salt">
+        <img class="oc-glow" src="assets/oc/glow.png" alt="">
+        <div class="oc-head">
+          <img data-emo="idle"     class="on" src="assets/oc/head_idle.png" alt="">
+          <img data-emo="blink"    src="assets/oc/head_blink.png" alt="">
+          <img data-emo="surprise" src="assets/oc/head_surprise.png" alt="">
+          <img data-emo="fear"     src="assets/oc/head_fear.png" alt="">
+          <img data-emo="resolve"  src="assets/oc/head_resolve.png" alt="">
+          <img data-emo="hurt"     src="assets/oc/head_hurt.png" alt="">
+        </div>
+        <div class="oc-aura"></div>
+      </div>
+      <div class="rig-tag"><b>SALT</b><span>Salt / 无档案者</span></div>
+    </div>
+
+    <!-- 演出叠层 -->
+    <div id="flashlight"></div>
+    <div id="halftone"></div>
+    <div id="vignette"></div>
+    <div id="dangerPulse"></div>
+    <div id="speedlines"></div>
+    <div id="glitch"><div class="g g1"></div><div class="g g2"></div><div class="g g3"></div></div>
+    <div id="flash"></div>
+
+    <!-- ========== HUD ========== -->
+    <div id="hud">
+      <div class="hud-tl">
+        <div class="chapter-tag">
+          <div class="ct-num" id="chapNum">00</div>
+          <div class="ct-txt"><b id="chapEn">PROLOGUE</b><span id="chapCn">序章 · 坠入灯塔</span></div>
+        </div>
+      </div>
+      <div class="hud-tr">
+        <div class="vital">
+          <div class="v-num" id="vSync">34<em>%</em></div>
+          <div class="v-lab">SYNC <span>意识同步率</span></div>
+        </div>
+        <div class="vital v-alt">
+          <div class="v-num" id="vBpm">72</div>
+          <div class="v-lab">BPM <span>心率</span></div>
+        </div>
+      </div>
+      <div class="ticker"><div class="ticker-lab">灯塔广播</div><div class="ticker-track"><span id="tickerTxt"></span></div></div>
+    </div>
+
+    <!-- ========== 对话 ========== -->
+    <div id="dialogue">
+      <div class="name-plate" id="namePlate"><b id="speakerCn">Salt</b><i id="speakerEn">NO RECORD</i></div>
+      <div class="dbox">
+        <div class="dbox-bar"></div>
+        <p id="dtext"></p>
+        <div class="d-next" id="dNext">▼</div>
+      </div>
+    </div>
+
+    <!-- ========== 选项 ========== -->
+    <div id="choices"></div>
+
+    <!-- ========== 控制条 ========== -->
+    <div id="ctrl">
+      <button data-act="auto"><b>AUTO</b><span>自动</span></button>
+      <button data-act="skip"><b>SKIP</b><span>快进</span></button>
+      <button data-act="save"><b>SAVE</b><span>存档</span></button>
+      <button data-act="load"><b>LOAD</b><span>读档</span></button>
+      <button data-act="title"><b>TITLE</b><span>标题</span></button>
+    </div>
+  </div>
+
+  <!-- ========== 视频过场 ========== -->
+  <div id="cutscene">
+    <video id="cutVideo" playsinline preload="auto"></video>
+    <div class="cut-bars"><i></i><i></i></div>
+    <div class="cut-sub" id="cutSub"></div>
+    <button class="cut-skip" id="cutSkip"><b>SKIP</b><span>跳过过场 ▸</span></button>
+    <div class="cut-tag">EVENT CUT — 01</div>
+  </div>
+
+  <!-- ========== 白光衔接层（开场 → 正片） ========== -->
+  <div id="whiteout" aria-hidden="true"></div>
+
+  <!-- ========== 开场动画（OC 穿越 · 视频） ========== -->
+  <div id="intro" aria-hidden="true">
+    <video id="introVideo" playsinline preload="auto" src="assets/video/intro.mp4"></video>
+    <div class="in-grain"></div>
+    <div class="in-vig"></div>
+    <div class="in-bars"><i></i><i></i></div>
+    <div class="in-cap" id="introCap"></div>
+    <div class="in-flash" id="introFlash"></div>
+    <button class="in-skip" id="introSkip"><b>SKIP</b><span>跳过开场 ▸</span></button>
+  </div>
+
+  <!-- ========== 标题画面 ========== -->
+  <div id="title">
+    <div class="t-key"></div>
+    <div class="t-stripes"></div>
+    <div class="t-sweep"></div>
+    <div class="t-splat"></div>
+
+    <div class="t-side"><b>VERTICAL SLICE 001</b><span>《灵笼》 FAN VISUAL NOVEL</span></div>
+
+    <div class="t-copy">
+      <div class="t-sup">A LING CAGE FAN VISUAL NOVEL</div>
+      <h1 class="t-main"><span>笼中</span><em>异色</em></h1>
+      <div class="t-en">CHROMA IN THE CAGE</div>
+      <ul class="t-menu">
+        <li data-menu="start"><i>01</i><b>NEW GAME</b><span>开始 · 序章</span></li>
+        <li data-menu="continue"><i>02</i><b>CONTINUE</b><span>继续 · 读取存档</span></li>
+        <li data-menu="about"><i>03</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
+      </ul>
+    </div>
+
+    <div class="t-card">
+      <div class="t-card-img"><img src="assets/oc/head_resolve.png" alt=""></div>
+      <div class="t-card-txt"><b>SALT</b><span>无档案者 / NO RECORD</span></div>
+    </div>
+
+    <div class="t-cmd">
+      <span><b>↑ ↓</b>选择</span><span><b>ENTER</b>确定</span><span><b>ESC</b>返回</span>
+    </div>
+    <div class="t-foot">OC「Salt / 秋刀想吃鱼」 · 同人二创 · 角色版权归原方所有</div>
+  </div>
+
+  <!-- ========== 关于 ========== -->
+  <div id="about">
+    <div class="ab-inner">
+      <h2><b>SYSTEM</b><span>关于这个 Demo</span></h2>
+      <div class="ab-grid">
+        <div><b>01</b><p><s>穿越开场动画</s>点 NEW GAME 后播放约 15 秒的原创开场：画室最后一笔 → 画布裂开紫色裂隙 → 坠入漩涡 → 灯塔基因档案检索「NO RECORD」→ 灯塔浮现。全程 CSS/SVG 实时演算，可随时跳过。</p></div>
+        <div><b>02</b><p><s>OC 常驻左侧</s>Salt全程固定在画面左侧，带呼吸起伏、随机眨眼、鼠标视差与 6 种剧情情绪（默认 / 惊讶 / 恐惧 / 坚定 / 受伤 / 闭眼）。表情用「原图像素 + 羽化面部融合」生成，除表情外每一根头发都与原立绘完全一致。</p></div>
+        <div><b>03</b><p><s>双层演出</s>环境层有孢子粒子、腥红危险脉冲、故障 Glitch、手电筒探索、速度线与镜头震动；角色层有立绘进退场、情绪切换与受击反馈。</p></div>
+        <div><b>04</b><p><s>情景视频过场</s>关键抉择后播放 13 秒 Salt × 马克同框过场，由 AI 关键帧 + 运镜合成，可随时跳过。</p></div>
+        <div><b>05</b><p><s>剧本驱动</s>剧情写在 <code>js/script.js</code> 里，引擎负责渲染。加一段剧情不用改一行引擎代码。</p></div>
+        <div><b>06</b><p><s>视觉语言</s>封面与 UI 参考《女神异闻录》系列：高饱和紫罗兰单色场、粗犷斜切排版、白底黑字的翻转菜单、半调网点与墨点飞溅，主色叠《灵笼》的腥红。</p></div>
+      </div>
+      <p class="ab-note">键盘：<b>空格 / 回车</b> 推进　<b>Ctrl</b> 按住快进　<b>Esc</b> 返回标题。进度自动存在浏览器本地。</p>
+      <button class="ab-close">返回 ◂</button>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script src="js/fx.js"></script>
+<script src="js/intro.js"></script>
+<script src="js/rig.js"></script>
+<script src="js/script.js"></script>
+<script src="js/engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+/* ============================================================
+   fx.css —— 演出特效层
+   ============================================================ */
+
+/* ---- 网点半调纹理（Persona 印刷感） ---- */
+#halftone{
+  position:absolute;inset:0;pointer-events:none;z-index:9;opacity:.5;
+  background-image:radial-gradient(circle,rgba(255,255,255,.075) 1px,transparent 1.25px);
+  background-size:4px 4px;
+  mix-blend-mode:overlay;
+}
+
+/* ---- 暗角 ---- */
+#vignette{
+  position:absolute;inset:0;pointer-events:none;z-index:8;
+  background:radial-gradient(118% 88% at 50% 46%,transparent 42%,rgba(0,0,0,.62) 100%);
+}
+
+/* ---- 危险脉冲（噬极兽逼近 / 心跳） ---- */
+#dangerPulse{
+  position:absolute;inset:0;pointer-events:none;z-index:10;opacity:0;
+  background:radial-gradient(110% 84% at 50% 52%,transparent 44%,rgba(255,31,75,.45) 100%);
+  transition:opacity .5s ease;
+}
+#dangerPulse.on{opacity:1;animation:dangerBeat 1.05s cubic-bezier(.3,0,.6,1) infinite}
+@keyframes dangerBeat{
+  0%   {opacity:.32;transform:scale(1)}
+  14%  {opacity:.95;transform:scale(1.035)}
+  28%  {opacity:.42;transform:scale(1)}
+  42%  {opacity:.78;transform:scale(1.02)}
+  100% {opacity:.32;transform:scale(1)}
+}
+
+/* ---- 手电筒探索 ---- */
+#flashlight{
+  position:absolute;inset:0;pointer-events:none;z-index:11;opacity:0;
+  transition:opacity .7s ease;
+  background:radial-gradient(circle 210px at var(--fx) 50%,
+              transparent 0,
+              rgba(0,0,0,.30) 34%,
+              rgba(0,0,0,.80) 58%,
+              rgba(2,2,6,.975) 78%);
+}
+#flashlight.on{opacity:1}
+#flashlight::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(circle 200px at var(--fx) 50%,rgba(190,215,255,.11),transparent 62%);
+  mix-blend-mode:screen;
+  animation:torchFlick 3.1s steps(1,end) infinite;
+}
+@keyframes torchFlick{
+  0%,88%,100%{opacity:1}
+  90%{opacity:.42}92%{opacity:.92}94%{opacity:.28}96%{opacity:.86}
+}
+
+/* ---- 速度线（Persona 冲击） ---- */
+#speedlines{
+  position:absolute;inset:-16%;pointer-events:none;z-index:13;opacity:0;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(255,255,255,.85) 0deg .28deg, transparent .28deg 2.1deg);
+  -webkit-mask-image:radial-gradient(circle at 50% 50%,transparent 22%,#000 62%);
+  mask-image:radial-gradient(circle at 50% 50%,transparent 22%,#000 62%);
+}
+#speedlines.on{animation:speedBurst .62s cubic-bezier(.1,.9,.3,1)}
+#speedlines.vio{background:repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(196,150,255,.95) 0deg .34deg, transparent .34deg 1.9deg)}
+@keyframes speedBurst{
+  0%  {opacity:0;transform:scale(1.5) rotate(0deg)}
+  22% {opacity:.95}
+  100%{opacity:0;transform:scale(1) rotate(9deg)}
+}
+
+/* ---- 故障 Glitch ---- */
+#glitch{position:absolute;inset:0;pointer-events:none;z-index:20;opacity:0}
+#glitch.on{opacity:1}
+#glitch .g{
+  position:absolute;left:0;right:0;
+  background:rgba(168,85,247,.16);
+  mix-blend-mode:screen;
+}
+#glitch .g1{top:18%;height:6%;animation:gSlide .21s steps(2,end) infinite}
+#glitch .g2{top:44%;height:11%;background:rgba(255,31,75,.15);animation:gSlide .17s steps(3,end) infinite reverse}
+#glitch .g3{top:71%;height:4%;background:rgba(34,211,238,.16);animation:gSlide .13s steps(2,end) infinite}
+@keyframes gSlide{
+  0%  {transform:translateX(-4%) scaleY(1)}
+  50% {transform:translateX(5%)  scaleY(1.6)}
+  100%{transform:translateX(-2%) scaleY(.7)}
+}
+/* 全屏 RGB 撕裂 */
+#stage.glitching{animation:rgbTear .34s steps(2,end) 3}
+@keyframes rgbTear{
+  0%  {filter:none;transform:translate3d(0,0,0)}
+  20% {filter:hue-rotate(-22deg) saturate(1.5);transform:translate3d(-9px,2px,0)}
+  40% {filter:hue-rotate(18deg) contrast(1.35);transform:translate3d(7px,-3px,0)}
+  60% {filter:invert(.14) saturate(1.7);transform:translate3d(-4px,1px,0)}
+  80% {filter:hue-rotate(-10deg);transform:translate3d(3px,0,0)}
+  100%{filter:none;transform:translate3d(0,0,0)}
+}
+
+/* ---- 白/紫闪 ---- */
+#flash{position:absolute;inset:0;pointer-events:none;z-index:30;opacity:0;background:#fff}
+#flash.go{animation:flashOut .5s ease-out}
+#flash.vio{background:radial-gradient(circle at 26% 52%,#e9d5ff,#a855f7 40%,#4c1d95)}
+#flash.red{background:radial-gradient(circle at 50% 50%,#ffd7e0,#ff1f4b 46%,#4a0413)}
+@keyframes flashOut{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
+
+/* ---- 镜头震动 ---- */
+#stage.shake-s{animation:shakeS .34s cubic-bezier(.36,.07,.19,.97)}
+#stage.shake-m{animation:shakeM .5s cubic-bezier(.36,.07,.19,.97)}
+#stage.shake-l{animation:shakeL .78s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shakeS{
+  0%,100%{transform:translate3d(0,0,0)}
+  25%{transform:translate3d(-4px,2px,0)}55%{transform:translate3d(3px,-2px,0)}80%{transform:translate3d(-2px,1px,0)}
+}
+@keyframes shakeM{
+  0%,100%{transform:translate3d(0,0,0) rotate(0)}
+  15%{transform:translate3d(-11px,5px,0) rotate(-.3deg)}
+  35%{transform:translate3d(9px,-6px,0) rotate(.28deg)}
+  55%{transform:translate3d(-7px,3px,0) rotate(-.18deg)}
+  78%{transform:translate3d(4px,-2px,0) rotate(.1deg)}
+}
+@keyframes shakeL{
+  0%,100%{transform:translate3d(0,0,0) rotate(0) scale(1)}
+  10%{transform:translate3d(-22px,10px,0) rotate(-.7deg) scale(1.012)}
+  26%{transform:translate3d(19px,-13px,0) rotate(.6deg) scale(1.016)}
+  44%{transform:translate3d(-15px,8px,0) rotate(-.42deg) scale(1.01)}
+  62%{transform:translate3d(11px,-6px,0) rotate(.3deg) scale(1.006)}
+  82%{transform:translate3d(-6px,3px,0) rotate(-.14deg) scale(1.002)}
+}
+
+/* ---- 章节大字卡（Persona 转场） ---- */
+#chapCard{
+  position:absolute;inset:0;z-index:35;display:none;
+  align-items:center;justify-content:center;overflow:hidden;
+}
+#chapCard.on{display:flex}
+#chapCard .cc-wipe{
+  position:absolute;inset:-20%;
+  background:linear-gradient(100deg,var(--violet-d),var(--crimson));
+  transform:skewX(-14deg) translateX(-130%);
+  animation:ccWipe 1.85s cubic-bezier(.7,0,.24,1) forwards;
+}
+#chapCard .cc-wipe2{
+  position:absolute;inset:-20%;background:#07070b;
+  transform:skewX(-14deg) translateX(-130%);
+  animation:ccWipe 1.85s cubic-bezier(.7,0,.24,1) .13s forwards;
+}
+@keyframes ccWipe{
+  0%  {transform:skewX(-14deg) translateX(-130%)}
+  38% {transform:skewX(-14deg) translateX(0)}
+  62% {transform:skewX(-14deg) translateX(0)}
+  100%{transform:skewX(-14deg) translateX(130%)}
+}
+#chapCard .cc-txt{
+  position:relative;z-index:2;text-align:center;
+  opacity:0;animation:ccTxt 1.85s ease forwards;
+}
+@keyframes ccTxt{
+  0%,16%{opacity:0;transform:translateX(-40px) skewX(-9deg)}
+  32%,58%{opacity:1;transform:translateX(0) skewX(-9deg)}
+  76%,100%{opacity:0;transform:translateX(40px) skewX(-9deg)}
+}
+#chapCard .cc-num{
+  font-family:var(--disp);font-size:clamp(60px,11vw,190px);line-height:.85;
+  color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.5);letter-spacing:.02em;
+}
+#chapCard .cc-en{font-family:var(--disp);font-size:clamp(22px,3.4vw,60px);letter-spacing:.24em;margin-top:-.1em}
+#chapCard .cc-cn{font-size:clamp(13px,1.4vw,22px);letter-spacing:.5em;color:rgba(255,255,255,.8);margin-top:.9em}
+
+/* ---- 心跳时的画面呼吸 ---- */
+#stage.tense #bgLayer{animation:tenseZoom 1.05s ease-in-out infinite}
+@keyframes tenseZoom{0%,100%{transform:scale(1)}18%{transform:scale(1.008)}}

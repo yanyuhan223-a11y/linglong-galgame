@@ -1,0 +1,4 @@
+.DS_Store
+*.bak
+_shot.html
+node_modules/
