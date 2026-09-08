@@ -1,0 +1,271 @@
+/* ============================================================
+   explore.css —— 画中世界 · 沉浸探索（移动端优先）
+   分阶段：warp 穿越 → fpv 第一视角看手 → build 伪3D建模 → run 跑动
+   ============================================================ */
+
+#explore{
+  position:absolute;inset:0;z-index:78;display:none;
+  background:#04050a;overflow:hidden;font-family:var(--cn);
+  color:#f4f2ec;
+  -webkit-tap-highlight-color:transparent;
+}
+#explore.on{display:block}
+#explore.enter{animation:exEnter .5s ease-out}
+@keyframes exEnter{0%{opacity:0}100%{opacity:1}}
+
+.ex-view{position:absolute;inset:0;overflow:hidden;z-index:1}
+
+/* 通用阶段层：默认隐藏，加 .on 显示 */
+.ex-phase{position:absolute;inset:0;opacity:0;visibility:hidden;
+  transition:opacity .5s ease;will-change:opacity}
+.ex-phase.on{opacity:1;visibility:visible}
+
+/* ============================================================
+   PHASE 0 · 穿越炫光 loading
+   ============================================================ */
+.ex-warp{z-index:30;background:radial-gradient(circle at 50% 50%,#1a0b38,#05030c 70%)}
+.warp-rays{position:absolute;inset:-40%;
+  background:repeating-conic-gradient(from 0deg at 50% 50%,
+    rgba(168,85,247,0) 0deg,rgba(168,85,247,.0) 4deg,
+    rgba(180,140,255,.55) 5deg,rgba(168,85,247,0) 8deg);
+  animation:warpSpin 3.2s linear infinite;filter:blur(1px);opacity:.9}
+@keyframes warpSpin{0%{transform:rotate(0) scale(1)}100%{transform:rotate(360deg) scale(1.15)}}
+.warp-core{position:absolute;left:50%;top:50%;width:38vmin;height:38vmin;
+  transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(circle,#fff 0%,#d8b4fe 22%,#7c3aed 48%,transparent 72%);
+  filter:blur(3px);animation:warpPulse 1.4s ease-in-out infinite}
+@keyframes warpPulse{0%,100%{transform:translate(-50%,-50%) scale(.72);opacity:.85}
+  50%{transform:translate(-50%,-50%) scale(1.08);opacity:1}}
+.warp-flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+.warp-flash.go{animation:warpBlind 1.15s cubic-bezier(.4,0,.6,.4) forwards}
+@keyframes warpBlind{0%{opacity:0}55%{opacity:1}100%{opacity:1}}
+.warp-tip{position:absolute;left:50%;bottom:16%;transform:translateX(-50%);text-align:center;
+  font-family:var(--disp);font-size:clamp(20px,6vw,34px);letter-spacing:.4em;
+  text-shadow:0 0 18px rgba(168,85,247,.8);animation:warpTip 1.6s ease-in-out infinite}
+.warp-tip span{display:block;margin-top:8px;font-family:var(--mono);font-size:11px;
+  letter-spacing:.34em;color:var(--cyan);text-shadow:none;opacity:.85}
+@keyframes warpTip{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* ============================================================
+   PHASE 1 · 第一视角看手 + 自言自语
+   ============================================================ */
+.ex-fpv{z-index:20;background:#05060a}
+.fpv-bg{position:absolute;inset:0;
+  background:url("../assets/explore/corridor_fp.jpg") center/cover no-repeat;
+  transform:scale(1.06);animation:fpvDrift 9s ease-in-out infinite alternate}
+@keyframes fpvDrift{0%{transform:scale(1.06) translateY(0)}100%{transform:scale(1.12) translateY(-1.5%)}}
+.fpv-fog{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(60% 40% at 50% 62%,rgba(120,180,220,.12),transparent 70%);
+  animation:fpvFog 6s ease-in-out infinite alternate}
+@keyframes fpvFog{0%{opacity:.5}100%{opacity:1}}
+.fpv-hands{position:absolute;left:0;bottom:0;width:100%;height:100%;
+  transform:translateY(120%);
+  background:url("../assets/explore/hands.png") center bottom/cover no-repeat;
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34%,#000 100%);
+          mask-image:linear-gradient(to bottom,transparent 0,#000 34%,#000 100%);
+  will-change:transform}
+.fpv-hands.raise{animation:handsRaise 1.4s cubic-bezier(.2,.7,.25,1) forwards}
+@keyframes handsRaise{0%{transform:translateY(120%)}100%{transform:translateY(8%)}}
+.fpv-hands.sway{animation:handsSway 4.5s ease-in-out infinite alternate}
+@keyframes handsSway{0%{transform:translateY(8%) rotate(-.5deg)}100%{transform:translateY(5%) rotate(.5deg)}}
+.fpv-vig{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(80% 70% at 50% 44%,transparent 46%,rgba(0,0,0,.7) 100%)}
+
+/* ============================================================
+   PHASE 2 · 伪3D建模 reveal
+   ============================================================ */
+.ex-build{z-index:24;background:radial-gradient(circle at 50% 60%,#0b0a1c,#04040a 75%)}
+.build-grid{position:absolute;inset:0;opacity:.5;
+  background-image:
+    linear-gradient(rgba(34,211,238,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(34,211,238,.18) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask-image:radial-gradient(60% 60% at 50% 55%,#000,transparent 78%);
+          mask-image:radial-gradient(60% 60% at 50% 55%,#000,transparent 78%);
+  animation:buildGrid 5s linear infinite}
+@keyframes buildGrid{0%{background-position:0 0}100%{background-position:44px 88px}}
+.build-ring{position:absolute;left:50%;bottom:14%;transform:translateX(-50%);
+  width:min(72vw,420px);height:60px;border-radius:50%;
+  background:radial-gradient(closest-side,rgba(124,58,237,.5),transparent 72%);
+  box-shadow:0 0 60px rgba(124,58,237,.6);animation:buildRing 2.2s ease-in-out infinite}
+@keyframes buildRing{0%,100%{opacity:.5;transform:translateX(-50%) scaleX(.9)}50%{opacity:1;transform:translateX(-50%) scaleX(1.05)}}
+.build-char{position:absolute;left:50%;bottom:13%;height:70%;
+  transform:translateX(-50%);transform-style:preserve-3d}
+.build-char img{height:100%;width:auto;display:block;
+  filter:drop-shadow(0 0 26px rgba(124,58,237,.7)) drop-shadow(0 12px 30px rgba(0,0,0,.6));
+  clip-path:inset(0 0 0 0)}
+.build-char.assemble img{animation:buildReveal 1.7s cubic-bezier(.3,.7,.3,1) forwards}
+@keyframes buildReveal{
+  0%{clip-path:inset(100% 0 0 0);filter:drop-shadow(0 0 40px rgba(34,211,238,.9)) brightness(2) saturate(0)}
+  70%{filter:drop-shadow(0 0 30px rgba(124,58,237,.8)) brightness(1.15) saturate(.9)}
+  100%{clip-path:inset(0 0 0 0);filter:drop-shadow(0 0 22px rgba(124,58,237,.6)) brightness(1) saturate(1)}}
+.build-char.spin{animation:buildSpin 6s ease-in-out infinite}
+@keyframes buildSpin{0%,100%{transform:translateX(-50%) perspective(1000px) rotateY(-9deg)}
+  50%{transform:translateX(-50%) perspective(1000px) rotateY(9deg)}}
+.build-scan{position:absolute;left:-6%;right:-6%;height:5px;top:0;
+  background:linear-gradient(90deg,transparent,rgba(34,211,238,.95),transparent);
+  box-shadow:0 0 22px 5px rgba(34,211,238,.6);opacity:0}
+.build-char.assemble .build-scan{animation:buildScan 1.7s cubic-bezier(.3,.7,.3,1) forwards}
+@keyframes buildScan{0%{top:100%;opacity:1}92%{opacity:1}100%{top:-4%;opacity:0}}
+
+/* ============================================================
+   PHASE 3 · 第三视角跑动
+   ============================================================ */
+.ex-run{z-index:16;background:#05060a}
+.run-far,.run-mid,.run-ground,.run-fg,.run-world{position:absolute;left:0;top:0;height:100%;will-change:transform}
+/* 远景：整张长廊侧图，铺满、压暗 */
+.run-far{width:100%;
+  background:url("../assets/explore/corridor_side.jpg") center/cover no-repeat;
+  filter:brightness(.5) saturate(.9)}
+.run-mid{width:300%;
+  background:url("../assets/explore/corridor_side.jpg") left center/auto 118% repeat-x;
+  filter:brightness(.75) contrast(1.05);opacity:.9}
+/* 地面走道 */
+.run-ground{width:100%;height:24%;top:auto;bottom:0;
+  background:linear-gradient(180deg,#141018 0%,#0a070e 60%,#050408 100%);
+  border-top:2px solid rgba(168,85,247,.35);box-shadow:0 -10px 34px rgba(109,40,217,.28)}
+.run-ground::before{content:"";position:absolute;left:-10%;right:-10%;top:0;height:3px;
+  background:repeating-linear-gradient(90deg,transparent 0 60px,rgba(34,211,238,.5) 60px 74px,transparent 74px 140px);
+  will-change:transform}
+.run-fg{width:100%;pointer-events:none}
+/* 世界层：马克 & 探索热点挂这里，随距离左移 */
+.run-world{width:100%}
+
+/* 探索热点（墙上发光符号，手电照到才亮） */
+.ex-glyph{position:absolute;bottom:36%;width:74px;height:96px;transform:translateX(-50%);
+  border:3px solid rgba(120,120,140,.25);border-radius:6px;
+  display:flex;align-items:center;justify-content:center;font-size:40px;color:rgba(120,120,140,.25);
+  transition:all .3s;text-shadow:none}
+.ex-glyph.lit{border-color:rgba(34,211,238,.9);color:#d8f6ff;
+  box-shadow:0 0 30px rgba(34,211,238,.6),inset 0 0 22px rgba(34,211,238,.35);text-shadow:0 0 16px rgba(34,211,238,.9)}
+
+/* 马克贴图 */
+.ex-mark{position:absolute;bottom:20%;transform:translateX(-50%);z-index:6}
+.ex-mark img{height:min(56vh,420px);width:auto;display:block;
+  filter:brightness(.92) drop-shadow(0 14px 30px rgba(0,0,0,.7))}
+.ex-mark .mk-ring{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  width:130px;height:26px;border-radius:50%;border:2px solid rgba(34,211,238,0);transition:.25s}
+.ex-mark.near .mk-ring{border-color:rgba(34,211,238,.8);box-shadow:0 0 24px rgba(34,211,238,.45);
+  animation:hotPulse 1.4s ease-in-out infinite}
+@keyframes hotPulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* Salt 跑动装置（屏幕固定，世界滚动） */
+.ex-salt{position:absolute;bottom:20%;left:30%;width:min(30vh,150px);height:min(60vh,300px);
+  transform:translateX(-50%);z-index:7}
+.ex-salt-in{position:absolute;left:0;bottom:0;width:100%;height:100%;
+  transform-origin:50% 100%;will-change:transform}
+.ex-salt img{position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:auto;height:100%;object-fit:contain;-webkit-user-drag:none;user-select:none;pointer-events:none}
+.es-glow{opacity:.85;mix-blend-mode:screen;filter:saturate(1.3)}
+.ex-shadow{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);
+  width:74%;height:18px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,0,0,.6),transparent 70%);z-index:-1;will-change:transform,opacity}
+
+/* 尘土 */
+.ex-dust{position:absolute;bottom:20%;width:8px;height:8px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,190,220,.7),transparent 70%);pointer-events:none;z-index:5}
+
+/* 手电筒：开启后压暗全场，露出跟随的光锥 */
+.torch{position:absolute;inset:0;z-index:9;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:radial-gradient(closest-side,transparent 0,transparent 20%,rgba(3,4,9,.9) 60%);
+  background-repeat:no-repeat;background-position:35% 55%;background-size:130vmin 130vmin}
+.ex-run.torch-on .torch{opacity:1}
+.ex-run.torch-on .run-far{filter:brightness(.22) saturate(.9)}
+.ex-run.torch-on .run-mid{filter:brightness(.3)}
+
+/* ============================================================
+   共享 · 边框 / 暗角 / 颗粒
+   ============================================================ */
+.ex-vig{position:absolute;inset:0;pointer-events:none;z-index:10;
+  background:radial-gradient(84% 76% at 50% 48%,transparent 52%,rgba(0,0,0,.6) 100%)}
+.ex-grain{position:absolute;inset:0;pointer-events:none;z-index:10;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+.ex-frame{position:absolute;inset:0;z-index:11;pointer-events:none;border:12px solid transparent;
+  box-shadow:inset 0 0 0 2px rgba(168,85,247,.22),inset 0 0 60px rgba(0,0,0,.6)}
+
+/* ============================================================
+   HUD
+   ============================================================ */
+.ex-top{position:absolute;top:0;left:0;right:0;z-index:14;display:flex;
+  justify-content:space-between;align-items:flex-start;
+  padding:calc(14px + env(safe-area-inset-top)) 18px 14px;pointer-events:none}
+.ex-chip{background:var(--crimson);color:#fff;padding:7px 13px;transform:skewX(var(--skew));
+  box-shadow:5px 5px 0 rgba(0,0,0,.5)}
+.ex-chip>*{display:block;transform:skewX(calc(var(--skew)*-1))}
+.ex-chip b{font-family:var(--disp);font-size:15px;letter-spacing:.14em}
+.ex-chip span{font-size:10.5px;opacity:.9;letter-spacing:.08em}
+.ex-exit{pointer-events:auto;background:var(--paper);color:var(--ink);padding:7px 13px;
+  transform:skewX(var(--skew));box-shadow:4px 4px 0 rgba(0,0,0,.5);transition:transform .12s}
+.ex-exit:active{transform:skewX(var(--skew)) translate(-2px,-2px)}
+.ex-exit>*{display:block;transform:skewX(calc(var(--skew)*-1))}
+.ex-exit b{font-family:var(--disp);font-size:13px}
+.ex-exit span{font-size:9.5px;opacity:.7}
+
+/* 字幕 / 自白 / 对话 */
+.ex-caption{position:absolute;left:50%;bottom:calc(150px + env(safe-area-inset-bottom));
+  transform:translate(-50%,10px);z-index:15;width:min(90vw,620px);
+  opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+.ex-caption.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.ex-caption i{display:block;font-family:var(--disp);font-style:normal;letter-spacing:.14em;
+  font-size:12px;color:var(--cyan);margin-bottom:6px;text-align:center}
+.ex-caption i:empty{display:none}
+.ex-caption p{background:var(--paper);color:var(--ink);margin:0;padding:15px 20px;border-radius:3px;
+  font-size:clamp(15px,4.2vw,17px);line-height:1.7;box-shadow:0 10px 34px rgba(0,0,0,.55);
+  border-left:5px solid var(--violet)}
+.ex-caption .rd{color:var(--crimson);font-weight:800}
+.cap-next{display:block;text-align:right;margin-top:6px;font-size:11px;letter-spacing:.1em;
+  color:rgba(244,242,236,.75);font-family:var(--mono)}
+
+/* 交互提示（马克头顶「上前对话」） */
+.ex-prompt{position:absolute;left:50%;top:34%;transform:translate(-50%,10px);z-index:13;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;
+  background:var(--paper);color:var(--ink);padding:7px 14px;border-radius:2px;font-weight:800;
+  letter-spacing:.04em;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.ex-prompt.on{opacity:1;transform:translate(-50%,0)}
+.ex-prompt b{color:var(--violet-d)}
+
+/* 底部控制条（跑动阶段） */
+.ex-ctrl{position:absolute;left:0;right:0;bottom:0;z-index:16;
+  display:none;justify-content:center;align-items:flex-end;gap:16px;
+  padding:0 20px calc(22px + env(safe-area-inset-bottom));pointer-events:none}
+.ex-ctrl.on{display:flex}
+.ex-torch-btn,.ex-run-btn{pointer-events:auto;user-select:none;color:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  border:2px solid rgba(168,85,247,.5);background:rgba(16,16,26,.62);backdrop-filter:blur(4px);
+  box-shadow:0 6px 18px rgba(0,0,0,.45);transition:transform .1s,background .18s,border-color .18s}
+.ex-torch-btn{width:66px;height:66px;border-radius:50%}
+.ex-torch-btn b{font-size:24px;line-height:1}
+.ex-torch-btn span{font-size:9px;letter-spacing:.04em;opacity:.85}
+.ex-torch-btn.on{border-color:var(--cyan);background:rgba(34,211,238,.22);
+  box-shadow:0 0 22px rgba(34,211,238,.5)}
+.ex-run-btn{min-width:180px;height:66px;border-radius:36px;border-color:rgba(34,211,238,.6)}
+.ex-run-btn b{font-family:var(--disp);font-size:20px;letter-spacing:.12em;color:var(--cyan)}
+.ex-run-btn span{font-size:10px;letter-spacing:.08em;opacity:.85}
+.ex-run-btn:active{transform:scale(.96);background:rgba(34,211,238,.16)}
+.ex-run-btn.pulse{animation:runPulse 1.3s ease-in-out infinite}
+@keyframes runPulse{0%,100%{box-shadow:0 6px 18px rgba(0,0,0,.45)}50%{box-shadow:0 0 26px rgba(34,211,238,.6)}}
+
+.ex-hint{position:absolute;left:50%;bottom:calc(102px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:13;
+  font-size:11.5px;letter-spacing:.05em;color:rgba(244,242,236,.72);text-align:center;
+  background:rgba(6,7,12,.5);padding:6px 14px;border-radius:18px;backdrop-filter:blur(4px);
+  transition:opacity .5s;max-width:88vw}
+.ex-hint b{color:var(--cyan);font-family:var(--mono);margin:0 2px}
+.ex-hint.hide{opacity:0}
+
+/* ============================================================
+   桌面端（宽屏）微调
+   ============================================================ */
+@media (min-width:860px){
+  .ex-caption{bottom:120px}
+  .ex-salt{left:28%}
+  .fpv-hands{width:min(90%,720px)}
+}
+
+/* 超窄竖屏 */
+@media (max-width:420px){
+  .ex-chip b{font-size:13px}
+  .ex-chip span{font-size:9px}
+  .ex-run-btn{min-width:150px;height:60px}
+  .ex-torch-btn{width:60px;height:60px}
+  .build-char{height:66%}
+}

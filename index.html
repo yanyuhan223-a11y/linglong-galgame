@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="css/base.css">
 <link rel="stylesheet" href="css/fx.css">
 <link rel="stylesheet" href="css/intro.css">
+<link rel="stylesheet" href="css/explore.css">
 </head>
 <body>
 
@@ -101,6 +102,84 @@
     </div>
   </div>
 
+  <!-- ========== 探索模式（画中世界 · 沉浸穿越，移动端优先） ========== -->
+  <div id="explore" aria-hidden="true">
+    <div class="ex-view" id="exView">
+
+      <!-- 阶段0：穿越炫光 -->
+      <div class="ex-phase ex-warp" id="exWarp">
+        <div class="warp-rays"></div>
+        <div class="warp-core"></div>
+        <div class="warp-flash" id="exWarpFlash"></div>
+        <div class="warp-tip">穿 越 中<span>SYNCHRONISING…</span></div>
+      </div>
+
+      <!-- 阶段1：第一视角看手 -->
+      <div class="ex-phase ex-fpv" id="exFpv">
+        <div class="fpv-bg"></div>
+        <div class="fpv-fog"></div>
+        <div class="fpv-hands" id="exHands"></div>
+        <div class="fpv-vig"></div>
+      </div>
+
+      <!-- 阶段2：伪3D建模 -->
+      <div class="ex-phase ex-build" id="exBuild">
+        <div class="build-grid"></div>
+        <div class="build-char" id="exBuildChar">
+          <img src="assets/oc/title_char.png" alt="Salt">
+          <div class="build-scan"></div>
+        </div>
+        <div class="build-ring"></div>
+      </div>
+
+      <!-- 阶段3：第三视角跑动 -->
+      <div class="ex-phase ex-run" id="exRun">
+        <div class="run-far" id="exRunFar"></div>
+        <div class="run-mid" id="exRunMid"></div>
+        <div class="run-ground"></div>
+        <div class="run-world" id="exRunWorld"></div>
+        <div class="run-fg" id="exRunFg"></div>
+        <div class="ex-salt" id="exSalt">
+          <div class="ex-salt-in">
+            <img class="es-body" src="assets/oc/body.png" alt="Salt">
+            <img class="es-glow" src="assets/oc/glow.png" alt="">
+            <img class="es-head" src="assets/oc/head_idle.png" alt="">
+          </div>
+          <div class="ex-shadow"></div>
+        </div>
+        <div class="torch" id="exTorch"></div>
+      </div>
+
+      <div class="ex-vig"></div>
+      <div class="ex-grain"></div>
+    </div>
+
+    <div class="ex-frame"></div>
+
+    <div class="ex-top">
+      <div class="ex-chip"><b>EXPLORE</b><span id="exChipSub">画中世界 · 步入灯塔</span></div>
+      <button class="ex-exit" id="exExit"><b>◂ TITLE</b><span>返回标题</span></button>
+    </div>
+
+    <!-- 字幕 / 自白 / 对话 -->
+    <div class="ex-caption" id="exCaption">
+      <i id="exCapName"></i>
+      <p id="exCapTxt"></p>
+      <span class="cap-next" id="exCapNext">▸ 轻触继续</span>
+    </div>
+
+    <!-- 马克头顶提示 -->
+    <div class="ex-prompt" id="exPrompt"></div>
+
+    <!-- 底部控制条（跑动阶段） -->
+    <div class="ex-ctrl" id="exCtrl">
+      <button class="ex-torch-btn" id="exTorchBtn"><b>🔦</b><span>手电筒</span></button>
+      <button class="ex-run-btn" id="exRunBtn"><b id="exRunIcon">▶▶</b><span id="exRunLabel">按住前进</span></button>
+    </div>
+
+    <div class="ex-hint" id="exHint"></div>
+  </div>
+
   <!-- ========== 视频过场 ========== -->
   <div id="cutscene">
     <video id="cutVideo" playsinline preload="auto"></video>
@@ -140,7 +219,8 @@
       <ul class="t-menu">
         <li data-menu="start"><i>01</i><b>NEW GAME</b><span>开始 · 序章</span></li>
         <li data-menu="continue"><i>02</i><b>CONTINUE</b><span>继续 · 读取存档</span></li>
-        <li data-menu="about"><i>03</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
+        <li data-menu="explore"><i>03</i><b>EXPLORE</b><span>穿越灯塔 · 沉浸探索</span></li>
+        <li data-menu="about"><i>04</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
       </ul>
     </div>
 
@@ -178,6 +258,7 @@
 <script src="js/fx.js"></script>
 <script src="js/intro.js"></script>
 <script src="js/rig.js"></script>
+<script src="js/explore.js"></script>
 <script src="js/script.js"></script>
 <script src="js/engine.js"></script>
 </body>

@@ -420,6 +420,7 @@
       const m = li.dataset.menu;
       if (m === 'start') startNew();
       if (m === 'continue') startContinue();
+      if (m === 'explore') { if (window.Explore) window.Explore.start(); }
       if (m === 'about') els.about.classList.add('on');
     }
 
@@ -464,6 +465,7 @@
         const m = li.dataset.menu;
         if (m === 'start') startNew();
         if (m === 'continue') startContinue();
+        if (m === 'explore') { if (window.Explore) window.Explore.start(); }
         if (m === 'about') els.about.classList.add('on');
       });
     });
@@ -483,5 +485,9 @@
     preload();
     els.tickerTxt.textContent = window.TICKERS.calm;
     document.querySelector('.t-menu li[data-menu="continue"]').classList.toggle('dis', !hasSave());
+    // 供探索模式调用的钩子
+    window.__showTitle = showTitle;
+    window.__hideTitle = hideTitle;
+    window.__startStory = () => startNew(true);   // 从探索直接进正片（跳过开场视频）
   });
 })();
