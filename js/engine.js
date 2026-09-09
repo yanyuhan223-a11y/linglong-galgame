@@ -63,18 +63,32 @@
     return -1;
   }
 
-  /* ---------------- 背景切换（双层交叉溶解） ---------------- */
+  /* ---------------- 背景切换（双层交叉溶解） ----------------
+     竖屏（手机）用竖版构图的 *_v.jpg，横屏用原来的 16:9 图。
+     旋转手机时会把当前背景按新方向重刷一遍。 */
   let bgFlip = false;
-  function setBg(name) {
-    if (S.curBg === name) return;
+  const portraitMQ = window.matchMedia('(max-aspect-ratio: 1/1)');
+  function bgUrl(name) {
+    const v = portraitMQ.matches ? '_v' : '';
+    return `assets/bg/${name}${v}.jpg`;
+  }
+  function setBg(name, force) {
+    if (S.curBg === name && !force) return;
     S.curBg = name;
     const show = bgFlip ? els.bgA : els.bgB;
     const hide = bgFlip ? els.bgB : els.bgA;
     bgFlip = !bgFlip;
-    show.style.backgroundImage = `url(assets/bg/${name}.jpg)`;
+    show.style.backgroundImage = `url(${bgUrl(name)})`;
     show.classList.add('on');
     hide.classList.remove('on');
   }
+  function reflowBg() {
+    if (!S.curBg) return;
+    const cur = bgFlip ? els.bgB : els.bgA;      // 上一次 setBg 点亮的那层
+    cur.style.backgroundImage = `url(${bgUrl(S.curBg)})`;
+  }
+  if (portraitMQ.addEventListener) portraitMQ.addEventListener('change', reflowBg);
+  else if (portraitMQ.addListener) portraitMQ.addListener(reflowBg);
 
   /* ---------------- 立绘 ---------------- */
   function setChar(name, dim) {

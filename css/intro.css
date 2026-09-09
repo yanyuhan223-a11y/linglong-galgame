@@ -445,3 +445,15 @@
   .fall-oc{height:44%}
   .st-easel{width:clamp(160px,44vw,240px)}
 }
+
+
+/* ============================================================
+   竖屏（移动端）：开场视频是 16:9，竖屏下不裁画面，
+   整帧居中显示，上下留白用视频自己的模糊底图补满。
+   ============================================================ */
+@media (max-aspect-ratio:1/1){
+  #introVideo{
+    object-fit:contain;
+    background:#000 url(../assets/video/intro-fill.jpg) center/cover no-repeat;
+  }
+}

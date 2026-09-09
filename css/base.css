@@ -589,3 +589,48 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   .hud-tr{gap:8px;top:2%}
   #ctrl button span{display:none}
 }
+
+
+/* ============================================================
+   竖屏（移动端）竖版视觉
+   所有场景图都有一张竖版构图的 *_v.jpg：
+     assets/ui/title-key_v.jpg · assets/bg/tower_v.jpg · assets/bg/ruins_v.jpg
+   正片背景由 engine.js 的 bgUrl() 按方向切换，这里只管标题页和视频。
+   ============================================================ */
+@media (max-aspect-ratio:1/1){
+  /* 标题页：竖版主视觉，人物在下半屏，上半屏是留给标题的紫色空场 */
+  .t-key{
+    background-image:url(../assets/ui/title-key_v.jpg);
+    background-position:center top;
+    background-size:cover;
+  }
+  #title::after{
+    right:0;left:0;top:0;bottom:auto;width:auto;height:58%;
+    background:linear-gradient(180deg,
+      rgba(108,50,209,.94) 0%,
+      rgba(108,50,209,.74) 44%,
+      rgba(108,50,209,0) 100%);
+  }
+  /* 竖版主视觉里已经画了 Salt，不再叠标题页那层立绘 */
+  .t-char,.t-charhead{display:none}
+
+  .t-copy{
+    top:7.5%;bottom:auto;transform:none;
+    left:5%;right:5%;margin-left:0;max-width:none;
+  }
+  .t-main{font-size:clamp(46px,15.5vw,86px)}
+  .t-en{font-size:clamp(10px,2.9vw,15px);letter-spacing:.3em}
+  .t-menu{margin-top:clamp(18px,3vh,32px)}
+  .t-menu li{padding:.42em .85em .42em 1.7em;gap:.6em}
+  .t-menu li b,.t-menu li span{white-space:nowrap}
+  .t-menu li b{font-size:clamp(15px,4.6vw,22px)}
+  .t-menu li span{font-size:9.5px;letter-spacing:.1em}
+  .t-stripes{right:-20%;top:-26%;height:74%}
+  .t-card{bottom:12%;max-width:64%}
+
+  /* 过场视频是 16:9：竖屏不裁画面，改成整帧显示，上下用模糊底图补满 */
+  #cutVideo{
+    object-fit:contain;
+    background:#000 url(../assets/video/cut01-fill.jpg) center/cover no-repeat;
+  }
+}

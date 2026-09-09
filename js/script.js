@@ -19,7 +19,7 @@ window.TICKERS = {
 window.SCRIPT = [
 
   /* ================= 序章 ================= */
-  { t: 'chap', num: '00', en: 'PROLOGUE', cn: '序章 · 坠入灯塔' },
+  { t: 'chap', num: 'I', en: 'ACT I · FALL', cn: '第一幕 · 坠入' },
   { t: 'fx', do: 'particles', arg: 'dust' },
 
   /* ---- 开场动画的白光还没散尽，就直接切进第一视角：
@@ -80,9 +80,9 @@ window.SCRIPT = [
   { t: 'char', v: null },
   { t: 'wait', ms: 500 },
 
-  /* ================= 第一章 ================= */
-  { t: 'card', num: '01', en: 'DESCENT', cn: '第 一 章 · 下 降' },
-  { t: 'chap', num: '01', en: 'DESCENT', cn: '第一章 · 下降' },
+  /* ================= 第二幕 ================= */
+  { t: 'card', num: 'II', en: 'ACT II · DESCENT', cn: '第 二 幕 · 下 降' },
+  { t: 'chap', num: 'II', en: 'ACT II · DESCENT', cn: '第二幕 · 下降' },
   { t: 'bg', v: 'ruins' },
   { t: 'fx', do: 'particles', arg: 'ash' },
   { t: 'hud', sync: 47, bpm: 104 },
@@ -131,6 +131,10 @@ window.SCRIPT = [
   { t: 'say', who: 'salt', emo: 'surprise', text: '它……看不见我？' },
   { t: 'say', who: 'narr', text: '因为你不属于这个世界的编码。你没有生命源质，你不是它的食物——你什么都不是。' },
   { t: 'say', who: 'narr', text: '而这一刻，「什么都不是」，成了你唯一的武器。' },
+
+  /* ================= 第三幕 ================= */
+  { t: 'card', num: 'III', en: 'ACT III · CHROMA', cn: '第 三 幕 · 异 色' },
+  { t: 'chap', num: 'III', en: 'ACT III · CHROMA', cn: '第三幕 · 异色' },
 
   /* ---- 抉择 2 ---- */
   { t: 'choice', opts: [
