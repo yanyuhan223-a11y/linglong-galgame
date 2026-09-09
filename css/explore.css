@@ -69,16 +69,19 @@
   pointer-events:none;z-index:4}
 
 /* 第一视角双手（抬手看手；往前走时收回画外） */
-.fpv-hands{position:absolute;left:0;bottom:0;width:100%;height:100%;z-index:6;
+/* --hy / --hy2 = 抬手到位后的垂直位置（sway 在两者之间来回）。
+   竖屏画面高、手会顶到画面上沿，所以竖屏要多往下挪一截；横屏保持原位。 */
+.fpv-hands{--hy:8%;--hy2:5%;
+  position:absolute;left:0;bottom:0;width:100%;height:100%;z-index:6;
   transform:translateY(120%);
   background:url("../assets/explore/hands.png") center bottom/cover no-repeat;
   -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 34%,#000 100%);
           mask-image:linear-gradient(to bottom,transparent 0,#000 34%,#000 100%);
   will-change:transform}
 .fpv-hands.raise{animation:handsRaise 1.4s cubic-bezier(.2,.7,.25,1) forwards}
-@keyframes handsRaise{0%{transform:translateY(120%)}100%{transform:translateY(8%)}}
+@keyframes handsRaise{0%{transform:translateY(120%)}100%{transform:translateY(var(--hy))}}
 .fpv-hands.sway{animation:handsSway 4.5s ease-in-out infinite alternate}
-@keyframes handsSway{0%{transform:translateY(8%) rotate(-.5deg)}100%{transform:translateY(5%) rotate(.5deg)}}
+@keyframes handsSway{0%{transform:translateY(var(--hy)) rotate(-.5deg)}100%{transform:translateY(var(--hy2)) rotate(.5deg)}}
 .fpv-hands.down{animation:handsDown .9s ease-in forwards}
 @keyframes handsDown{to{transform:translateY(120%)}}
 
@@ -349,4 +352,9 @@
   .st-ring{-webkit-mask:radial-gradient(circle,transparent 0 36px,#000 36px 42px,transparent 42px);
            mask:radial-gradient(circle,transparent 0 36px,#000 36px 42px,transparent 42px)}
   .ex-caption{bottom:calc(118px + env(safe-area-inset-bottom))}
+}
+
+/* 竖屏：手往下挪一截，别贴着画面上沿 */
+@media (max-aspect-ratio: 1/1){
+  .fpv-hands{--hy:22%;--hy2:19%}
 }

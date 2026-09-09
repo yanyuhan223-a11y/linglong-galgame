@@ -18,7 +18,8 @@
     { voice: 'ep_03', text: '第一幕里，这是他们指认你的罪证。' },
     { voice: 'ep_04', text: '到了第三幕，<span class="hl">这成了你唯一握得住的武器。</span>' }
   ];
-  var LAST = { voice: 'ep_07', text: '笼中异色 · 第一章　完', cls: 'last', tail: 900 };
+  /* 收尾那句只上字幕，不配音（voice 留空即静默显示） */
+  var LAST = { voice: null, text: '笼中异色 · 第一章　完', cls: 'last', hold: 2600 };
 
   /* 每个结局的专属两句 */
   var TAILS = {
@@ -75,7 +76,8 @@
       .catch(function () { DUR = {}; return DUR; });
   }
   function minMs(item) {
-    var d = DUR && DUR[item.voice] && DUR[item.voice].dur;
+    if (item.hold) return item.hold;          // 无配音的行：按指定时长静默停留
+    var d = item.voice && DUR && DUR[item.voice] && DUR[item.voice].dur;
     if (d) return d * 1000 + (item.tail || 420);
     return 2200 + item.text.replace(/<[^>]+>/g, '').length * 260;
   }
@@ -95,7 +97,7 @@
         var rest = Math.max(0, floor - (Date.now() - t0));
         if (rest > 60) T(resolve, rest); else resolve();
       };
-      if (window.Snd && window.Snd.voice) {
+      if (item.voice && window.Snd && window.Snd.voice) {
         window.Snd.voice(item.voice).then(function () { T(finish, item.tail || 420); });
         T(finish, floor + 6000);          // 事件全丢的兜底
       } else {
