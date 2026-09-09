@@ -10,8 +10,23 @@
   const S = {
     i: 0, flags: {}, running: false, typing: false,
     auto: false, skip: false, holdSkip: false,
-    curBg: '', curChar: null, tmr: [], typeTimer: 0
+    curBg: '', curChar: null, tmr: [], typeTimer: 0,
+    tense: false, combat: false
   };
+
+  /* 音频快捷方式：Snd 没就位时全部安全空转 */
+  const SND = {
+    fx: (n) => { if (window.Snd) window.Snd.sfx(n); },
+    bgm: (n) => { if (window.Snd) window.Snd.bgm(n); },
+    duck: (on) => { if (window.Snd) window.Snd.duck(on); }
+  };
+  // 正片当前该放哪首：战斗 > 紧张 > 场景底色
+  function sceneBgm() {
+    if (S.combat) return 'battle';
+    if (S.tense) return 'tension';
+    return S.curBg === 'ruins' ? 'ruins' : 'story';
+  }
+  function refreshBgm() { SND.bgm(sceneBgm()); }
 
   const els = {};
   function cache() {
@@ -26,6 +41,7 @@
   function sleep(ms) { return new Promise((r) => { const t = setTimeout(r, ms); S.tmr.push(t); }); }
   function clearTimers() { S.tmr.forEach(clearTimeout); S.tmr = []; }
   function toast(msg) {
+    if (window.Snd) window.Snd.sfx('toast');
     els.toast.textContent = msg;
     els.toast.classList.add('on');
     setTimeout(() => els.toast.classList.remove('on'), 1700);
@@ -159,6 +175,7 @@
         } while (i < tokens.length && tokens[i][0] === '<' && tokens[i].length > 1);
         els.dtext.innerHTML = out;
         if (window.Rig && Math.random() < 0.14) window.Rig.talk();
+        if (!S.skip && !S.holdSkip) SND.fx('type');
         S.typeTimer = setTimeout(step, S.skip || S.holdSkip ? 0 : speed);
       };
       const finish = () => {
@@ -187,8 +204,9 @@
   }
   function advance() {
     if (els.choices.classList.contains('on')) return;
-    if (S.typing) { flushType(); return; }
-    if (waiter) { const w = waiter; waiter = null; w(); }
+    if (S.typing) { flushType(); SND.fx('advance'); return; }
+    if (window.Snd) window.Snd.stopVoice();     // 玩家主动推进就掐掉旁白
+    if (waiter) { const w = waiter; waiter = null; SND.fx('advance'); w(); }
   }
 
   /* ---------------- 选项 ---------------- */
@@ -205,13 +223,16 @@
         b.addEventListener('click', () => {
           els.choices.classList.remove('on');
           els.choices.innerHTML = '';
+          SND.fx('choiceOk');
           if (window.FX) window.FX.speed(true);
           if (o.flag) Object.assign(S.flags, o.flag);
           resolve(o);
         });
+        b.addEventListener('mouseenter', () => SND.fx('hover'));
         els.choices.appendChild(b);
       });
       els.choices.classList.add('on');
+      SND.fx('choiceIn');
     });
   }
 
@@ -256,11 +277,12 @@
   /* ---------------- 节点执行 ---------------- */
   async function exec(n) {
     switch (n.t) {
-      case 'bg': setBg(n.v); await sleep(S.skip ? 0 : 260); break;
+      case 'bg': setBg(n.v); refreshBgm(); await sleep(S.skip ? 0 : 260); break;
 
       case 'chap': setChapter(n); break;
 
       case 'card':
+        SND.fx('chapter');
         if (!S.skip) await window.FX.chapterCard(n.num, n.en, n.cn);
         break;
 
@@ -283,12 +305,14 @@
         els.ctrl.classList.remove('on');
         els.hud.classList.remove('on');
         veilStage(true);                       // 正片舞台先藏好，白光散尽时不会露出正片第一幕
+        SND.bgm('explore');                    // 第一视角：空旷低频 + 风
         const ex = window.Explore ? window.Explore.playInStory() : Promise.resolve();
         // 第一视角画面已经在白光底下铺好了 —— 现在才放白光走，白光直接淡成回廊
         releaseWhiteout(220);
         await ex;
         veilStage(false);
         els.ctrl.classList.add('on');
+        refreshBgm();                          // 回正片，切回场景底色
         break;
       }
 
@@ -297,13 +321,13 @@
       case 'fx': {
         const F = window.FX, R = window.Rig;
         if (n.do === 'particles') F.particles(n.arg);
-        else if (n.do === 'flash') F.flash(n.arg);
-        else if (n.do === 'shake') F.shake(n.arg);
-        else if (n.do === 'glitch') { F.glitch(n.arg); if (!S.skip) await sleep(Math.min(n.arg || 900, 900)); }
+        else if (n.do === 'flash') { F.flash(n.arg); SND.fx('zap'); }
+        else if (n.do === 'shake') { F.shake(n.arg); SND.fx('impact'); }
+        else if (n.do === 'glitch') { F.glitch(n.arg); SND.fx('glitch'); if (!S.skip) await sleep(Math.min(n.arg || 900, 900)); }
         else if (n.do === 'speed') F.speed(n.arg);
         else if (n.do === 'torch') F.torch(n.arg);
-        else if (n.do === 'danger') F.danger(n.arg);
-        else if (n.do === 'charge') R.charge(n.arg);
+        else if (n.do === 'danger') { F.danger(n.arg); if (n.arg) SND.fx('danger'); S.tense = !!n.arg; refreshBgm(); }
+        else if (n.do === 'charge') { R.charge(n.arg); if (n.arg) SND.fx('charge'); S.combat = !!n.arg; refreshBgm(); }
         break;
       }
 
@@ -320,8 +344,12 @@
         if (n.react) window.Rig.react(n.react);
         els.charImg.classList.toggle('dim', n.who !== 'mark' && S.curChar ? els.charImg.classList.contains('dim') : els.charImg.classList.contains('dim'));
         const speed = n.who === 'narr' ? 26 : 32;
+        // n.v：这句配了 TTS 旁白 —— 语音念完自动翻页，玩家点击可提前跳过
+        const vp = (n.v && window.Snd && !S.skip && !S.holdSkip) ? window.Snd.voice(n.v) : null;
         await typeText(n.text, speed);
-        await waitClick();
+        if (vp) { await Promise.race([vp, waitClick()]); waiter = null; }
+        else await waitClick();
+        if (window.Snd) window.Snd.stopVoice();
         break;
       }
 
@@ -334,7 +362,9 @@
 
       case 'video': {
         els.dialogue.classList.remove('on');
+        SND.duck(true);                 // 视频自带声音，BGM 让位
         await playCut(n);
+        SND.duck(false);
         break;
       }
 
@@ -347,6 +377,12 @@
   async function endScreen() {
     els.dialogue.classList.remove('on');
     els.ctrl.classList.remove('on');
+    els.hud.classList.remove('on');
+    S.tense = false; S.combat = false;
+    SND.bgm('ending');
+    // 片尾讲述：黑场 + 逐行字幕 + TTS 旁白
+    if (window.Epilog) await window.Epilog.play();
+    SND.fx('chapter');
     await window.FX.chapterCard('END', 'TO BE CONTINUED', '第 三 幕 · 异色　完');
     S.running = false;
     localStorage.removeItem(SAVE_KEY);
@@ -388,7 +424,10 @@
   function showTitle() {
     clearTimers();
     S.running = false; S.typing = false; waiter = null;
+    S.tense = false; S.combat = false;
+    if (window.Snd) window.Snd.stopVoice();
     veilStage(false);
+    SND.bgm('title');
     els.title.classList.remove('off');
     els.dialogue.classList.remove('on');
     els.choices.classList.remove('on');
@@ -420,9 +459,11 @@
   }
 
   async function startNew(skipIntro, joinLabel) {
+    if (window.Snd) window.Snd.unlock();       // 用户手势里解锁音频
     // 开场动画：OC 穿越
     if (!skipIntro && window.Intro) {
       els.title.classList.add('off');
+      SND.bgm('none', { fast: true });         // 开场视频自带声音，BGM 全退
       await window.Intro.play();
     }
     hideTitle();
@@ -478,12 +519,14 @@
     } else {
       await sleep(560);
     }
+    refreshBgm();
     run();
   }
 
   async function startContinue() {
     const d = loadSave();
     if (!d) { toast('没有可用的存档'); return; }
+    if (window.Snd) window.Snd.unlock();
     hideTitle();
     veilStage(false);
     S.i = d.i; S.flags = d.flags || {};
@@ -496,6 +539,7 @@
     window.Rig.named(true);
     await sleep(560);
     toast('已读取存档');
+    refreshBgm();
     run();
   }
 
@@ -514,6 +558,7 @@
     }
     function moveSel(d) {
       const items = menuItems(); if (!items.length) return;
+      SND.fx('hover');
       let idx = items.findIndex((l) => l.classList.contains('sel'));
       idx = (idx < 0 ? (d > 0 ? -1 : 0) : idx) + d;
       if (idx < 0) idx = items.length - 1;
@@ -524,6 +569,7 @@
     function fireMenu(li) {
       if (!li) return;
       const m = li.dataset.menu;
+      SND.fx('click');
       if (m === 'start') startNew();
       if (m === 'continue') startContinue();
       if (m === 'about') els.about.classList.add('on');
@@ -558,6 +604,7 @@
     els.ctrl.addEventListener('click', (e) => {
       const b = e.target.closest('button'); if (!b) return;
       const a = b.dataset.act;
+      SND.fx('click');
       if (a === 'auto') { S.auto = !S.auto; b.classList.toggle('active', S.auto); toast(S.auto ? '自动播放 开' : '自动播放 关'); if (S.auto) advance(); }
       if (a === 'skip') { S.skip = !S.skip; b.classList.toggle('active', S.skip); toast(S.skip ? '快进中…' : '快进 关'); if (S.skip) { flushType(); advance(); } }
       if (a === 'save') { autoSave(); toast('已存档'); }
@@ -566,14 +613,16 @@
     });
 
     document.querySelectorAll('.t-menu li').forEach((li) => {
+      li.addEventListener('mouseenter', () => SND.fx('hover'));
       li.addEventListener('click', () => {
         const m = li.dataset.menu;
+        SND.fx('click');
         if (m === 'start') startNew();
         if (m === 'continue') startContinue();
           if (m === 'about') els.about.classList.add('on');
       });
     });
-    document.querySelector('.ab-close').addEventListener('click', () => els.about.classList.remove('on'));
+    document.querySelector('.ab-close').addEventListener('click', () => { SND.fx('back'); els.about.classList.remove('on'); });
   }
 
   /* ---------------- 启动 ---------------- */

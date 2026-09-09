@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="css/fx.css">
 <link rel="stylesheet" href="css/intro.css">
 <link rel="stylesheet" href="css/explore.css">
+<link rel="stylesheet" href="css/epilog.css">
 </head>
 <body>
 
@@ -195,6 +196,16 @@
   <!-- ========== 白光衔接层（开场 → 正片） ========== -->
   <div id="whiteout" aria-hidden="true"></div>
 
+  <!-- ========== 片尾讲述（TTS 旁白） ========== -->
+  <div id="epilog" aria-hidden="true">
+    <div class="ep-bg"></div>
+    <div class="ep-scan"></div>
+    <div class="ep-mark"><b>EPILOGUE</b><span>尾声 · 讲述</span></div>
+    <div class="ep-lines" id="epLines"></div>
+    <div class="ep-wave" id="epWave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <button class="ep-skip" id="epSkip"><b>SKIP</b><span>跳过讲述 ▸</span></button>
+  </div>
+
   <!-- ========== 开场动画（OC 穿越 · 视频） ========== -->
   <div id="intro" aria-hidden="true">
     <video id="introVideoBg" class="vfill" muted playsinline preload="none" aria-hidden="true"></video>
@@ -256,13 +267,20 @@
   </div>
 
   <div id="toast"></div>
+
+  <!-- 声音开关（全局常驻） -->
+  <button id="sndBtn" title="声音开关" aria-label="声音开关">
+    <span class="sb-ico"><i></i><i></i><i></i></span><b>SOUND</b>
+  </button>
 </div>
 
+<script src="js/audio.js"></script>
 <script src="js/fx.js"></script>
 <script src="js/vfill.js"></script>
 <script src="js/intro.js"></script>
 <script src="js/rig.js"></script>
 <script src="js/explore.js"></script>
+<script src="js/epilog.js"></script>
 <script src="js/script.js"></script>
 <script src="js/engine.js"></script>
 </body>

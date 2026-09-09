@@ -181,15 +181,15 @@ window.SCRIPT = [
   { t: 'fx', do: 'particles', arg: 'volt' },
   { t: 'hud', sync: 76, bpm: 88 },
   { t: 'bg', v: 'ruins' },
-  { t: 'say', who: 'narr', text: '光散去的时候，雾里空了。' },
-  { t: 'say', who: 'narr', text: '藤蔓退回地缝，玛娜之花合上了花瓣。连风都绕着你走。' },
+  { t: 'say', who: 'narr', v: 'nr_01', text: '光散去的时候，雾里空了。' },
+  { t: 'say', who: 'narr', v: 'nr_02', text: '藤蔓退回地缝，玛娜之花合上了花瓣。连风都绕着你走。' },
   { t: 'char', v: 'mark' },
   { t: 'say', who: 'mark', text: '……咳。' },
   { t: 'say', who: 'mark', text: '你到底是什么东西。' },
   { t: 'say', who: 'salt', emo: 'idle', text: '我也很想知道。' },
   { t: 'say', who: 'salt', emo: 'resolve', text: '不过在弄清楚之前——先带我回去吧，指挥官。' },
-  { t: 'say', who: 'narr', text: '灯塔的名册上没有你。' },
-  { t: 'say', who: 'narr', text: '但从这一刻起，<span class="hl">这个世界记住了你</span>。' },
+  { t: 'say', who: 'narr', v: 'nr_03', text: '灯塔的名册上没有你。' },
+  { t: 'say', who: 'narr', v: 'nr_04', text: '但从这一刻起，<span class="hl">这个世界记住了你</span>。' },
 
   { t: 'end' }
 ];

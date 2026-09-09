@@ -95,10 +95,15 @@
   var last = 0;
   var raf = null;
   var moteT = 0;
+  var stepK = 0;          // 落脚计数：bob 每过一个 π 就是一步
   var timers = [];
 
   var cap = { list: [], i: 0, done: null, open: false };
   var stick = { active: false, id: null, cx: 0, cy: 0, r: 46, nx: 0, ny: 0 };
+
+  /* 音效：Snd 没就位时安全空转 */
+  function SX(n) { if (window.Snd) window.Snd.sfx(n); }
+  function SB(n) { if (window.Snd) window.Snd.bgm(n); }
 
   function T(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
   function clearTimers() { timers.forEach(clearTimeout); timers = []; }
@@ -151,6 +156,7 @@
     var html = l.t.replace(/<em>/g, '<span class="rd">').replace(/<\/em>/g, '</span>');
     HL.forEach(function (h) { html = html.replace(h[0], function (m) { return '<span class="' + h[1] + '">' + m + '</span>'; }); });
     els.capTxt.innerHTML = html;
+    SX(l.s === '马克' ? 'choiceIn' : 'advance');
     if (l.fx === 'glow' && els.hands) {
       els.hands.classList.add('glow');
     }
@@ -194,13 +200,14 @@
     setPhase('warp');
     els.warpFlash.classList.remove('go');
     void els.warpFlash.offsetWidth;
-    T(function () { els.warpFlash.classList.add('go'); }, 900);
+    T(function () { els.warpFlash.classList.add('go'); SX('whiteout'); }, 900);
     T(toFpv, 1750);
   }
 
   /* ---------- 1. 睁眼 + 抬手 ---------- */
   function toFpv(recover) {
     setPhase('fpv');
+    SB('explore');
     dist = 0; bob = 0; panX = 0;
     applyCorridor();
     els.fpv.classList.remove('recover');
@@ -283,6 +290,7 @@
   function runBeat(b) {
     fwd = 0;
     releaseStick();
+    if (b.fx === 'alert') SX('danger');
     if (b.fx === 'alert' && els.mkRig) {
       els.mkRig.classList.remove('alert');
       void els.mkRig.offsetWidth;
@@ -310,6 +318,8 @@
     if (walking) {
       dist += SPEED * power * dt;
       bob += dt * (5.4 + power * 2.6);
+      var k = Math.floor(bob / Math.PI);
+      if (k !== stepK) { stepK = k; SX('step'); }   // 每次落脚一声
       moteT += dt;
       if (moteT > 0.16) { moteT = 0; spawnMote(); }
 
@@ -317,6 +327,7 @@
       if (torchOn && !glyphDone && dist > GLYPH_D - 90) {
         glyphDone = true;
         els.glyph.classList.add('lit');
+        SX('glitch');
         runBeat({ lines: GLYPH_LINE, hint: '继续往前' });
       }
       // 沿途节拍
@@ -334,6 +345,7 @@
       }
     } else {
       bob += dt * 1.4; // 站着的时候只有呼吸
+      stepK = Math.floor(bob / Math.PI);
     }
 
     // 摄影机：走路上下起伏 + 摇杆横推带来的视线左右摆
@@ -351,6 +363,7 @@
   function onArrive() {
     els.hint.classList.add('hide');
     els.ctrl.classList.add('locked');
+    SX('near');
     els.prompt.innerHTML = '<b>马克</b> 挡住了回廊尽头';
     els.prompt.classList.add('on');
     T(function () { els.prompt.classList.remove('on'); }, 2200);
@@ -359,6 +372,7 @@
 
   function talkMark() {
     els.ctrl.classList.remove('on');
+    SB('tension');
     openCap(MARK_TALK, function () {
       els.prompt.innerHTML = '▸ 跟着他走';
       els.prompt.classList.add('on');
@@ -452,6 +466,7 @@
       torchOn = !torchOn;
       els.torchBtn.classList.toggle('on', torchOn);
       els.fpv.classList.toggle('torch-on', torchOn);
+      SX(torchOn ? 'click' : 'back');
       applyCorridor();
     });
 

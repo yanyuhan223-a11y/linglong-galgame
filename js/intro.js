@@ -20,6 +20,7 @@
     f.classList.add('blind');
     void f.offsetWidth;
     f.classList.add('go');
+    if (window.Snd) window.Snd.sfx('whiteout');   // 白光的耳鸣/冲击声
   }
 
   /* 声音衔接：把视频音量平滑降到 0，避免硬切 */
