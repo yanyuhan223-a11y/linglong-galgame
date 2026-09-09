@@ -27,6 +27,8 @@
   /* ---------- 台词 ---------- */
   // 白光后第一屏就先落在自己的第一视角手上，随后才意识到这里完全不是原来的世界。
   var MONO = [
+    { s: '', t: '耳朵里嗡着一声长长的鸣叫。眼前先是一整片白，然后白里慢慢渗出形状。' },
+    { s: 'SALT', t: '……站不稳。地在转。' },
     { s: '', t: '白光猛地一收，你最先看见的是自己抬在眼前的手。指尖发颤，掌心还残着一点没退干净的光。', fx: 'glow' },
     { s: 'SALT', t: '……怎么回事？' },
     { s: 'SALT', t: '我这是……在哪？' },
@@ -217,7 +219,8 @@
     els.hands.classList.add('raise');
     T(function () { els.hands.classList.add('sway'); }, recover ? 520 : 240);
     els.warpFlash.classList.remove('go');
-    T(function () { openCap(MONO, toWalk); }, recover ? 1480 : 980);
+    // recover（正片内嵌）时白光要退成白雾再散尽、眩晕层还在转，先让玩家晃一会儿再开口
+    T(function () { openCap(MONO, toWalk); }, recover ? 3200 : 980);
   }
 
   /* ---------- 2. 摇杆往前走 ---------- */

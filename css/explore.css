@@ -314,12 +314,28 @@
 #explore.ex-out{animation:exOut .8s ease-in forwards}
 @keyframes exOut{0%{opacity:1}100%{opacity:0}}
 
-/* 正片内嵌：睁眼时视线从模糊里恢复（替代穿越炫光，避免和开场视频重复） */
-.ex-fpv.recover .fpv-cam{animation:exRecover 2.6s cubic-bezier(.25,.8,.3,1) forwards}
+/* 正片内嵌：睁眼时视线从模糊里恢复（替代穿越炫光，避免和开场视频重复）
+   4.6s：白雾散尽（≈4.3s）之后镜头还在晃两下才稳住 */
+.ex-fpv.recover .fpv-cam{animation:exRecover 4.6s cubic-bezier(.25,.8,.3,1) forwards}
 @keyframes exRecover{
-  0%{filter:blur(22px) brightness(2.6) saturate(.2);transform:scale(1.16)}
-  30%{filter:blur(11px) brightness(1.5) saturate(.6)}
-  100%{filter:blur(0) brightness(1) saturate(1);transform:scale(1.05)}}
+  0%  {filter:blur(24px) brightness(2.8) saturate(.16);transform:scale(1.2) rotate(-2.4deg) translateX(2.4%)}
+  16% {filter:blur(16px) brightness(1.9) saturate(.4);transform:scale(1.16) rotate(1.9deg) translateX(-2%)}
+  34% {filter:blur(10px) brightness(1.5) saturate(.6);transform:scale(1.13) rotate(-1.4deg) translateX(1.5%)}
+  54% {filter:blur(5.5px) brightness(1.26) saturate(.78);transform:scale(1.1) rotate(1deg) translateX(-1%)}
+  74% {filter:blur(2.4px) brightness(1.12) saturate(.9);transform:scale(1.075) rotate(-.5deg) translateX(.5%)}
+  88% {filter:blur(1px) brightness(1.04);transform:scale(1.062) rotate(.22deg)}
+  100%{filter:blur(0) brightness(1) saturate(1);transform:scale(1.05) rotate(0) translateX(0)}}
+
+/* 站不稳的那几秒：整个第一视角（含手、暗角）一起小幅打晃 */
+.ex-fpv.recover{animation:fpvWobble 4.6s cubic-bezier(.3,.6,.35,1) 1 forwards}
+@keyframes fpvWobble{
+  0%  {transform:scale(1.07) translate3d(1.6%,-.8%,0) rotate(-1.2deg)}
+  18% {transform:scale(1.07) translate3d(-1.5%,.9%,0) rotate(1deg)}
+  36% {transform:scale(1.06) translate3d(1.1%,-.6%,0) rotate(-.7deg)}
+  56% {transform:scale(1.045) translate3d(-.7%,.4%,0) rotate(.45deg)}
+  76% {transform:scale(1.025) translate3d(.35%,-.2%,0) rotate(-.2deg)}
+  100%{transform:none}
+}
 
 /* 手上淡淡的光（"为什么我的手在发光"） */
 .fpv-hands::after{content:"";position:absolute;inset:0;opacity:0;pointer-events:none;

@@ -68,6 +68,13 @@
       default: return a >= b;     // 缺省 >=
     }
   }
+  /* {t:'var',k:'trust',op:'+',v:2}：= 赋值 / - 减 / 其余当加 */
+  function applyVar(n) {
+    if (n.op === '=') S.flags[n.k] = n.v;
+    else if (n.op === '-') S.flags[n.k] = num(n.k) - n.v;
+    else S.flags[n.k] = num(n.k) + n.v;
+  }
+
   function test(c) { return cmp(num(c.k), c.op, c.v); }
   function testNode(n) {
     if (n.all) return n.all.every(test);
@@ -107,13 +114,34 @@
      谁先在白光底下把画面铺好，白光就淡成谁 —— 绝不能在中间露出别的东西。 */
   function veilStage(on) { if (els.stage) els.stage.classList.toggle('veil', !!on); }
 
+  /* 眩晕术式：白光散尽时压一层重影 / 打转 / 耳鸣圈 / 心跳暗角，约 4.6s 后自己收干净 */
+  let dizzyTimers = [];
+  function dizzySpell() {
+    const vg = $('vertigo');
+    dizzyTimers.forEach(clearTimeout); dizzyTimers = [];
+    if (!vg) return;
+    vg.classList.remove('on');
+    void vg.offsetWidth;                       // 重排一次，动画能重放
+    vg.classList.add('on');
+    SND.fx('heart');
+    dizzyTimers.push(setTimeout(() => SND.fx('heart'), 1150));
+    dizzyTimers.push(setTimeout(() => SND.fx('heart'), 2450));
+    dizzyTimers.push(setTimeout(() => vg.classList.remove('on'), 3800));
+  }
+
+  /* 白光退场分两段：先退成一片朦胧白雾（还看不清），雾里起眩晕，再慢慢散尽 */
   function releaseWhiteout(delay) {
     const wo = $('whiteout');
     if (!wo || !wo.classList.contains('hold')) return false;
     setTimeout(() => {
-      wo.classList.remove('hold');
-      wo.classList.add('fade');
-      setTimeout(() => wo.classList.remove('fade'), 1900);
+      wo.classList.remove('hold', 'pulse');
+      wo.classList.add('haze');                // ① 拉到半透明白雾，停一下
+      dizzySpell();                             //    雾里就开始天旋地转
+      setTimeout(() => {
+        wo.classList.remove('haze');
+        wo.classList.add('fade');               // ② 白雾散尽
+        setTimeout(() => wo.classList.remove('fade'), 2400);
+      }, 1250);
     }, delay || 0);
     return true;
   }
@@ -121,7 +149,7 @@
   // 白光散尽后的"第一幕"是不是第一视角探索段？
   // 只跨过 chap / flag / fx / hud / wait / label 这类不出画面的节点。
   function firstExploreIdx(from) {
-    const pass = { chap: 1, flag: 1, fx: 1, hud: 1, wait: 1, label: 1 };
+    const pass = { chap: 1, flag: 1, fx: 1, hud: 1, wait: 1, label: 1, var: 1 };
     for (let k = from; k < window.SCRIPT.length; k++) {
       const n = window.SCRIPT[k];
       if (!n) break;
@@ -348,9 +376,7 @@
       case 'flag': S.flags[n.k] = n.v; break;
 
       case 'var':                                   // 数值增减：{t:'var',k:'trust',op:'+',v:2}
-        if (n.op === '=') S.flags[n.k] = n.v;
-        else if (n.op === '-') S.flags[n.k] = num(n.k) - n.v;
-        else S.flags[n.k] = num(n.k) + n.v;
+        applyVar(n);
         if (n.toast) relToast({ [n.k]: (n.op === '-' ? -n.v : n.v) });
         break;
 
@@ -375,8 +401,8 @@
         veilStage(true);                       // 正片舞台先藏好，白光散尽时不会露出正片第一幕
         SND.bgm('explore');                    // 第一视角：空旷低频 + 风
         const ex = window.Explore ? window.Explore.playInStory() : Promise.resolve();
-        // 第一视角画面已经在白光底下铺好了 —— 现在才放白光走，白光直接淡成回廊
-        releaseWhiteout(220);
+        // 第一视角画面已经在白光底下铺好了 —— 白光再驻留一会（眼前只剩白的那几秒），才放它退成白雾
+        releaseWhiteout(1000);
         await ex;
         veilStage(false);
         els.ctrl.classList.add('on');
@@ -562,6 +588,7 @@
       else if (n.t === 'chap') setChapter(n);
       else if (n.t === 'hud') setHud(n);
       else if (n.t === 'flag') S.flags[n.k] = n.v;
+      else if (n.t === 'var') applyVar(n);
     }
     els.hud.classList.add('on');
     window.Rig.named(true);
@@ -600,6 +627,7 @@
         if (!n) continue;
         if (n.t === 'chap') setChapter(n);
         else if (n.t === 'flag') S.flags[n.k] = n.v;
+        else if (n.t === 'var') applyVar(n);
         else if (n.t === 'fx' && n.do === 'particles') window.FX.particles(n.arg);
       }
       els.hud.classList.remove('on');
@@ -611,20 +639,23 @@
 
     // 正片场景已铺好，白光多停留一会，再带眩晕感淡出：游戏从刺眼白光里晃着浮现
     if (holding) {
+      const HOLD = 1100;                          // 白光驻留（比原来久一倍）
       setTimeout(() => {
         if (els.stage) {
           els.stage.classList.remove('dizzy');
           void els.stage.offsetWidth;
           els.stage.classList.add('dizzy');
         }
-        wo.classList.remove('hold');
-        wo.classList.add('fade');
-      }, 620);                                    // 白光驻留
+        wo.classList.remove('hold', 'pulse');
+        wo.classList.add('haze');
+        dizzySpell();
+        setTimeout(() => { wo.classList.remove('haze'); wo.classList.add('fade'); }, 1250);
+      }, HOLD);
       setTimeout(() => {
-        wo.classList.remove('fade');
+        wo.classList.remove('haze', 'fade');
         if (els.stage) els.stage.classList.remove('dizzy');
-      }, 620 + 2200);                             // 淡出 + 眩晕结束后清理
-      await sleep(1150);                          // 文字随“回过神”渐显
+      }, HOLD + 1250 + 2500);                     // 白雾散尽 + 眩晕结束后清理
+      await sleep(HOLD + 1500);                   // 文字随“回过神”渐显
     } else {
       await sleep(560);
     }

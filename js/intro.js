@@ -56,7 +56,8 @@
         cleanup();
         // 白光驻留期间切场景：先把全局白光层拉满，再撤开场层，游戏从白光里淡出（见 engine.startNew）
         const w = $('whiteout');
-        if (w) { w.classList.remove('fade'); w.classList.add('hold'); }
+        if (w) { w.classList.remove('fade', 'haze'); w.classList.add('hold', 'pulse'); }
+        if (window.Snd) window.Snd.sfx('tinnitus');   // 白光里先响起耳鸣
         root.classList.add('fading');
         setTimeout(() => {
           try { video.pause(); } catch (e) {}
@@ -75,8 +76,8 @@
           flashed = true;
           blindFlash();
           audioFadeOut(video, 1300);   // 音频与白光一起收束，避免硬切
-          // 白光升满并多停留一会，再进入正片
-          setTimeout(finish, 1250);
+          // 白光升满并驻留（久一点：眼前只剩一片白的那几秒）
+          setTimeout(finish, 1900);
         }
       };
       const onEnded = () => {
@@ -115,7 +116,7 @@
           flashed = true;
           blindFlash();
           audioFadeOut(video, 600);
-          setTimeout(finish, 700);
+          setTimeout(finish, 1100);
         } else finish();
       };
     });

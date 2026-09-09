@@ -457,6 +457,34 @@
       noise(1.6, 0.13, 'highpass', 400, 0.7, 5200);
       setTimeout(function () { noise(0.5, 0.2, 'lowpass', 2600, 0.8, 200); }, 1350);
     },
+    /* 耳鸣：两个相差 6Hz 的高频正弦互相打拍，缓进缓出 —— 白光之后脑袋里那声长鸣 */
+    tinnitus: function () {
+      if (!ctx) return;
+      var t = ctx.currentTime, dur = 4.4;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.05, t + 0.5);
+      g.gain.setValueAtTime(0.05, t + 2.2);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6200;
+      [3080, 3086].forEach(function (f) {
+        var o = ctx.createOscillator(); o.type = 'sine';
+        o.frequency.setValueAtTime(f, t);
+        o.frequency.linearRampToValueAtTime(f * 0.86, t + dur);   // 慢慢往下掉，像在退
+        o.connect(lp); o.start(t); o.stop(t + dur + 0.1);
+      });
+      lp.connect(g); g.connect(gSfx);
+      noise(dur, 0.028, 'bandpass', 2200, 0.7, 900);              // 底下垫一层嘶声
+    },
+    /* 心跳：两下闷响，血压没跟上的那种「咚—咚」 */
+    heart: function () {
+      blip(52, 'sine', 0.3, 0.2, 34);
+      noise(0.16, 0.05, 'lowpass', 220, 0.8);
+      setTimeout(function () {
+        blip(46, 'sine', 0.36, 0.14, 30);
+        noise(0.18, 0.035, 'lowpass', 190, 0.8);
+      }, 330);
+    },
     charge: function () {
       blip(70, 'sawtooth', 1.4, 0.13, 440);
       noise(1.4, 0.09, 'bandpass', 900, 3, 3600);
