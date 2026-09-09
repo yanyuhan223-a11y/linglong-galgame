@@ -25,14 +25,17 @@
   var DEAD = 0.16;        // 摇杆死区
 
   /* ---------- 台词 ---------- */
+  // 开场：重点是"我被丢进了一个完全陌生的世界"，不是看手
   var MONO = [
-    { s: '', t: '……冷。金属的冷，顺着后背一节一节爬上来。' },
-    { s: '', t: '手。是我的手。指节、虎口上那块旧茧，都还在。' },
-    { s: 'SALT', t: '我怎么到这里来了？' },
-    { s: 'SALT', t: '这是哪里……刚才那道光是什么东西？' },
-    { s: '', t: '指缝里浮着一层很淡的光，随着呼吸一亮一暗。', fx: 'glow' },
-    { s: 'SALT', t: '而且——为什么我的手<em>在发光</em>？' },
-    { s: '', t: '远处有低频的嗡鸣，像某种极大的机器还在运转。脚下的格栅在轻轻发抖。' }
+    { s: '', t: '白光散尽的时候，脚下已经不是自己房间的地板了。' },
+    { s: 'SALT', t: '……这是哪里？' },
+    { s: '', t: '一条望不到头的回廊。墙是铁的，地也是铁的，格栅缝里渗出一层青蓝色的冷光。' },
+    { s: '', t: '铁锈和消毒水混在一起的味道，冷得发苦。远处压着一阵低频的嗡鸣，像某种极大的机器从来没停过。' },
+    { s: 'SALT', t: '不是梦。梦不会这么冷，也不会有味道。' },
+    { s: '', t: '脚下的格栅在轻轻发抖——不是地震那种抖。是某种巨大的东西正托着这里，悬在半空。' },
+    { s: 'SALT', t: '我到底<em>穿到什么地方来了</em>……' },
+    { s: '', t: '你伸手扶住墙撑住自己。指缝间浮着一层很淡的光，随着呼吸一明一暗。', fx: 'glow' },
+    { s: 'SALT', t: '（……先找到出去的路。）' }
   ];
 
   var RADIO = [
@@ -149,7 +152,11 @@
     var html = l.t.replace(/<em>/g, '<span class="rd">').replace(/<\/em>/g, '</span>');
     HL.forEach(function (h) { html = html.replace(h[0], function (m) { return '<span class="' + h[1] + '">' + m + '</span>'; }); });
     els.capTxt.innerHTML = html;
-    if (l.fx === 'glow' && els.hands) els.hands.classList.add('glow');
+    if (l.fx === 'glow' && els.hands) {
+      els.hands.classList.add('raise');
+      T(function () { els.hands.classList.add('sway'); }, 1500);
+      T(function () { els.hands.classList.add('glow'); }, 700);
+    }
     if (l.s === '马克' && els.mkHead) {
       els.mkHead.classList.remove('nod');
       void els.mkHead.offsetWidth;
@@ -201,9 +208,7 @@
     applyCorridor();
     els.fpv.classList.remove('recover');
     if (recover) { void els.fpv.offsetWidth; els.fpv.classList.add('recover'); }
-    els.hands.classList.remove('down', 'sway', 'glow');
-    els.hands.classList.add('raise');
-    T(function () { els.hands.classList.add('sway'); }, 1400);
+    els.hands.classList.remove('down', 'sway', 'glow', 'raise');
     els.warpFlash.classList.remove('go');
     T(function () { openCap(MONO, toWalk); }, recover ? 1900 : 1200);
   }
@@ -211,8 +216,10 @@
   /* ---------- 2. 摇杆往前走 ---------- */
   function toWalk() {
     setPhase('walk');
-    els.hands.classList.remove('raise', 'sway');
-    els.hands.classList.add('down');
+    if (els.hands.classList.contains('raise')) {
+      els.hands.classList.remove('raise', 'sway');
+      els.hands.classList.add('down');
+    }
     dist = 0; arrived = false; glyphDone = false; beatI = 0;
     els.stick.classList.add('idle');
     showHint('把左下角的<b>摇杆</b>往上推，慢慢往回廊深处走', 6500);

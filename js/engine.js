@@ -239,9 +239,7 @@
         els.choices.classList.remove('on');
         els.ctrl.classList.remove('on');
         els.hud.classList.remove('on');
-        const wo = document.getElementById('whiteout');
-        if (wo) wo.classList.remove('hold', 'fade');
-        if (els.stage) els.stage.classList.remove('dizzy');
+        // 不去动 #whiteout：让开场那道白光自然淡尽，正好淡出成第一视角画面
         if (window.Explore) await window.Explore.playInStory();
         els.ctrl.classList.add('on');
         break;

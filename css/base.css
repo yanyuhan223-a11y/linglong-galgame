@@ -570,6 +570,14 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   .t-char,.t-charhead{opacity:.3;left:auto;right:-24%}
   .ab-grid{grid-template-columns:1fr}
   #ctrl{top:auto;bottom:calc(3.4% + clamp(96px,15vh,170px) + 40px);right:3%}
+
+  /* 移动端：说话人名牌靠右，让开左下角立绘的 SALT 名牌，两块紫牌不再叠在一起 */
+  #dialogue{display:flex;flex-direction:column;align-items:flex-end}
+  .dbox{width:100%}
+  .name-plate{transform:skewX(var(--skew)) translateX(-8px);padding:.28em 1.1em .32em .9em}
+  /* 立绘名牌同时收窄一档，留出更多余量 */
+  .rig-tag{left:10%;bottom:5%;padding:.28em .8em .32em}
+  .rig-tag span{letter-spacing:.14em}
 }
 @media (max-width:760px){
   :root{--skew:-6deg}
