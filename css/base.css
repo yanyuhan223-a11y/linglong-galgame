@@ -629,14 +629,17 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   .t-card{bottom:12%;max-width:64%}
 
   /* 过场视频是 16:9：竖屏不裁画面，改成整帧显示，上下用同一支视频的模糊放大层补满，
-     再用一条紫线把画面框成「影格」，字幕/标签贴着画面走 */
-  #cutVideo{object-fit:contain;background:transparent}
+     再用一条紫线把画面框成「影格」，字幕/标签贴着画面走。
+     注意：#cutVideo 本来是 flex 里的静态元素，不给 position/z-index 会被
+     补底层（.vfill 是绝对定位 z-index:0）盖死 —— 画面就整条糊成一片。 */
+  #cutVideo{position:relative;z-index:1;object-fit:contain;background:transparent}
+  .cut-bars,.cut-sub,.cut-skip,.cut-tag{z-index:3}
   .cut-bars i{height:0}
   .cut-sub{bottom:20%}
   .cut-tag{top:calc(50% - 28.125vw - 26px);left:6%;background:none;padding:0}
   .cut-skip{bottom:6%}
   #cutscene::after{
-    content:'';position:absolute;left:0;right:0;top:calc(50% - 28.125vw);height:1px;z-index:30;
+    content:'';position:absolute;left:0;right:0;top:calc(50% - 28.125vw);height:1px;z-index:4;
     background:linear-gradient(90deg,transparent,rgba(176,132,255,.8),transparent);
     box-shadow:0 56.25vw 0 0 rgba(176,132,255,.5);
     pointer-events:none;
