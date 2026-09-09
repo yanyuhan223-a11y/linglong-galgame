@@ -10,16 +10,39 @@
 
   /* voice: 音频 id；text: 屏幕上的字；at: 该行在这段语音里的出现时间（秒）
      ep_05 有 11 秒，拆成两行显示，共用同一段语音 */
-  var LINES = [
+
+  /* 三个结局共用的开场四句：说清「没有编号」这件事怎么从罪证变成武器 */
+  var HEAD = [
     { voice: 'ep_01', text: '灯塔把每个人都写进名册，用一个编号确认你还活着。' },
     { voice: 'ep_02', text: '而你没有编号。<span class="hl">你是这套秩序里的一个错误。</span>' },
     { voice: 'ep_03', text: '第一幕里，这是他们指认你的罪证。' },
-    { voice: 'ep_04', text: '到了第三幕，<span class="hl">这成了你唯一握得住的武器。</span>' },
-    { voice: 'ep_05', text: '地面之下，玛娜之花还在往上长。',
-      more: [{ at: 5.4, text: '灯塔之上，有人已经开始查一个查不到的名字。' }] },
-    { voice: 'ep_06', text: '而你留在这个世界里的第一道痕迹，<span class="hl">是一道紫色的电。</span>' },
-    { voice: 'ep_07', text: '笼中异色 · 第一章　完', cls: 'last', tail: 900 }
+    { voice: 'ep_04', text: '到了第三幕，<span class="hl">这成了你唯一握得住的武器。</span>' }
   ];
+  var LAST = { voice: 'ep_07', text: '笼中异色 · 第一章　完', cls: 'last', tail: 900 };
+
+  /* 每个结局的专属两句 */
+  var TAILS = {
+    roster: [
+      { voice: 'ea_01', text: '你终于有了一个编号。<span class="hl">可编号不是名字</span>——它只证明你被允许存在。' },
+      { voice: 'ea_02', text: '这一次有人替你担保。',
+        more: [{ at: 4.0, text: '下一次，也许该轮到你，替别人站到前面。' }] }
+    ],
+    specimen: [
+      { voice: 'eb_01', text: '他们最后还是给了你一个编号。<span class="hl">只不过写在样本栏里。</span>' },
+      { voice: 'eb_02', text: '玻璃的另一侧，有人在等你先眨眼。',
+        more: [{ at: 4.6, text: '而你在等一个人，把那份调令撕掉。' }] }
+    ],
+    unnamed: [
+      { voice: 'ep_05', text: '地面之下，玛娜之花还在往上长。',
+        more: [{ at: 5.4, text: '灯塔之上，有人已经开始查一个查不到的名字。' }] },
+      { voice: 'ep_06', text: '而你留在这个世界里的第一道痕迹，<span class="hl">是一道紫色的电。</span>' }
+    ]
+  };
+
+  function linesFor(id) {
+    var tail = TAILS[id] || TAILS.unnamed;
+    return HEAD.concat(tail, [LAST]);
+  }
 
   var running = false, skipped = false, timers = [];
 
@@ -81,9 +104,10 @@
     });
   }
 
-  function play() {
+  function play(id) {
     if (running) return Promise.resolve();
     running = true; skipped = false;
+    var LINES = linesFor(id);
     var root = $('epilog');
     $('epLines').innerHTML = '';
     root.classList.add('on');

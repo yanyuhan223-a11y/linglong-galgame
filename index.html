@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="css/intro.css">
 <link rel="stylesheet" href="css/explore.css">
 <link rel="stylesheet" href="css/epilog.css">
+<link rel="stylesheet" href="css/branch.css">
 </head>
 <body>
 
@@ -234,7 +235,8 @@
       <ul class="t-menu">
         <li data-menu="start"><i>01</i><b>NEW GAME</b><span>开始 · 第一幕</span></li>
         <li data-menu="continue"><i>02</i><b>CONTINUE</b><span>继续 · 读取存档</span></li>
-        <li data-menu="about"><i>03</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
+        <li data-menu="archive"><i>03</i><b>ARCHIVE</b><span>结局档案 · <em id="endCount">0 / 3</em></span></li>
+        <li data-menu="about"><i>04</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
       </ul>
     </div>
 
@@ -265,6 +267,20 @@
       <button class="ab-close">返回 ◂</button>
     </div>
   </div>
+
+  <!-- ========== 结局档案 ========== -->
+  <div id="archive">
+    <div class="arc-inner">
+      <h2><b>ARCHIVE</b><span>结局档案 · 你走过的路</span></h2>
+      <p class="arc-note">结局由两件事决定：<b>马克对你的信任</b>，以及<b>灯塔对「异色」的关注度</b>。
+        每一次抉择都在悄悄改写这两个数——右上角会告诉你它动了。</p>
+      <ul class="arc-list" id="endList"></ul>
+      <button class="arc-close">返回 ◂</button>
+    </div>
+  </div>
+
+  <!-- 关系变化提示（选择的后果，看得见） -->
+  <div id="relToast"></div>
 
   <div id="toast"></div>
 

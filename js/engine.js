@@ -46,6 +46,58 @@
     els.toast.classList.add('on');
     setTimeout(() => els.toast.classList.remove('on'), 1700);
   }
+  /* ---------------- 变量 / 条件 ----------------
+     数值变量和 flag 共用 S.flags，存档时一起带走。
+     trust  = 马克对你的信任
+     expose = 灯塔对"异色"的关注度                       */
+  function num(k) {
+    const v = S.flags[k];
+    return typeof v === 'number' ? v : (parseFloat(v) || 0);
+  }
+  function addVars(set) {
+    if (!set) return;
+    Object.keys(set).forEach((k) => { S.flags[k] = num(k) + set[k]; });
+  }
+  function cmp(a, op, b) {
+    switch (op) {
+      case '>': return a > b;
+      case '<': return a < b;
+      case '<=': return a <= b;
+      case '!=': return a != b;   // eslint-disable-line eqeqeq
+      case '==': case '=': return a == b;   // eslint-disable-line eqeqeq
+      default: return a >= b;     // 缺省 >=
+    }
+  }
+  function test(c) { return cmp(num(c.k), c.op, c.v); }
+  function testNode(n) {
+    if (n.all) return n.all.every(test);
+    if (n.any) return n.any.some(test);
+    return test(n);
+  }
+
+  /* 选择带来的关系变化：飘一条小提示，让玩家看得见后果 */
+  function relToast(set) {
+    if (!set || !window.VARMETA) return;
+    const box = $('relToast');
+    if (!box) return;
+    const rows = [];
+    Object.keys(set).forEach((k) => {
+      const m = window.VARMETA[k];
+      if (!m || !set[k]) return;
+      const up = set[k] > 0;
+      const arrow = (up ? '▲' : '▼').repeat(Math.min(Math.abs(set[k]), 3));
+      rows.push('<i class="' + (up ? 'up' : 'dn') + '"><b>' + m.cn + '</b><em>' + arrow + '</em></i>');
+    });
+    if (!rows.length) return;
+    box.innerHTML = rows.join('');
+    box.classList.remove('on');
+    void box.offsetWidth;
+    box.classList.add('on');
+    SND.fx('toast');
+    const t = setTimeout(() => box.classList.remove('on'), 2600);
+    S.tmr.push(t);
+  }
+
   function findLabel(name) {
     return window.SCRIPT.findIndex((n) => n.t === 'label' && n.v === name);
   }
@@ -226,6 +278,7 @@
           SND.fx('choiceOk');
           if (window.FX) window.FX.speed(true);
           if (o.flag) Object.assign(S.flags, o.flag);
+          if (o.set) { addVars(o.set); relToast(o.set); }
           resolve(o);
         });
         b.addEventListener('mouseenter', () => SND.fx('hover'));
@@ -276,6 +329,8 @@
 
   /* ---------------- 节点执行 ---------------- */
   async function exec(n) {
+    // 任何节点都可以挂 cond：条件不满足就整条跳过
+    if (n.cond && !testNode(n.cond)) return;
     switch (n.t) {
       case 'bg': setBg(n.v); refreshBgm(); await sleep(S.skip ? 0 : 260); break;
 
@@ -291,6 +346,19 @@
       case 'hud': setHud(n); break;
 
       case 'flag': S.flags[n.k] = n.v; break;
+
+      case 'var':                                   // 数值增减：{t:'var',k:'trust',op:'+',v:2}
+        if (n.op === '=') S.flags[n.k] = n.v;
+        else if (n.op === '-') S.flags[n.k] = num(n.k) - n.v;
+        else S.flags[n.k] = num(n.k) + n.v;
+        if (n.toast) relToast({ [n.k]: (n.op === '-' ? -n.v : n.v) });
+        break;
+
+      case 'if': {                                  // 条件跳转：满足 → goto，否则 → else
+        const tgt = testNode(n) ? n.goto : n.else;
+        if (tgt) { const j = findLabel(tgt); if (j >= 0) S.i = j; }
+        break;
+      }
 
       case 'wait': if (!S.skip && !S.holdSkip) await sleep(n.ms); break;
 
@@ -369,24 +437,64 @@
       }
 
       case 'end':
-        await endScreen();
+        await endScreen(n.v);
         break;
     }
   }
 
-  async function endScreen() {
+  async function endScreen(id) {
     els.dialogue.classList.remove('on');
     els.ctrl.classList.remove('on');
     els.hud.classList.remove('on');
     S.tense = false; S.combat = false;
     SND.bgm('ending');
-    // 片尾讲述：黑场 + 逐行字幕 + TTS 旁白
-    if (window.Epilog) await window.Epilog.play();
+    const E = (window.ENDINGS && window.ENDINGS[id]) || null;
+    if (E) unlockEnding(id);
+    // 片尾讲述：黑场 + 逐行字幕 + TTS 旁白（按结局走不同文本）
+    if (window.Epilog) await window.Epilog.play(id);
     SND.fx('chapter');
-    await window.FX.chapterCard('END', 'TO BE CONTINUED', '第 三 幕 · 异色　完');
+    await window.FX.chapterCard(
+      E ? E.code : 'END',
+      E ? E.en : 'TO BE CONTINUED',
+      E ? (E.cn + '　·　第一章 完') : '第 三 幕 · 异色　完'
+    );
     S.running = false;
     localStorage.removeItem(SAVE_KEY);
     showTitle();
+  }
+
+  /* ---------------- 结局档案 ---------------- */
+  const END_KEY = 'chroma_cage_endings_v1';
+  function gotEndings() {
+    try { return JSON.parse(localStorage.getItem(END_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function unlockEnding(id) {
+    try {
+      const g = gotEndings();
+      g[id] = Date.now();
+      localStorage.setItem(END_KEY, JSON.stringify(g));
+    } catch (e) { /* 无痕模式 */ }
+  }
+  function openArchive() {
+    renderArchive();
+    const a = $('archive');
+    if (a) a.classList.add('on');
+  }
+  function renderArchive() {
+    const box = $('endList');
+    if (!box || !window.ENDINGS) return;
+    const got = gotEndings();
+    const ids = Object.keys(window.ENDINGS);
+    box.innerHTML = ids.map((id) => {
+      const e = window.ENDINGS[id];
+      const on = !!got[id];
+      return '<li class="' + (on ? 'got' : 'lock') + '">' +
+        '<i>' + e.code + '</i>' +
+        '<div><b>' + (on ? e.cn : '？？？') + '</b><span>' + (on ? e.en : 'LOCKED') + '</span>' +
+        '<p>' + (on ? e.hint : '尚未抵达这个结局') + '</p></div></li>';
+    }).join('');
+    const c = $('endCount');
+    if (c) c.textContent = ids.filter((id) => got[id]).length + ' / ' + ids.length;
   }
 
   /* ---------------- 主循环 ---------------- */
@@ -435,6 +543,7 @@
     els.ctrl.classList.remove('on');
     window.FX.danger(false); window.FX.torch(false); window.Rig.charge(false);
     document.querySelector('.t-menu li[data-menu="continue"]').classList.toggle('dis', !hasSave());
+    renderArchive();
   }
 
   function hideTitle() {
@@ -573,13 +682,16 @@
       if (m === 'start') startNew();
       if (m === 'continue') startContinue();
       if (m === 'about') els.about.classList.add('on');
+      if (m === 'archive') openArchive();
     }
 
     document.addEventListener('keydown', (e) => {
       if (window.Intro && window.Intro.playing) return;   // 开场动画自行处理按键
       const onTitle = !els.title.classList.contains('off');
 
-      if (onTitle && !els.about.classList.contains('on')) {
+      const panelOpen = els.about.classList.contains('on') ||
+        ($('archive') && $('archive').classList.contains('on'));
+      if (onTitle && !panelOpen) {
         if (e.code === 'ArrowDown') { e.preventDefault(); moveSel(1); return; }
         if (e.code === 'ArrowUp') { e.preventDefault(); moveSel(-1); return; }
         if (e.code === 'Enter' || e.code === 'Space') {
@@ -592,7 +704,8 @@
       if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); advance(); }
       if (e.code === 'ControlLeft' || e.code === 'ControlRight') { S.holdSkip = true; flushType(); }
       if (e.code === 'Escape') {
-        if (els.about.classList.contains('on')) els.about.classList.remove('on');
+        if ($('archive') && $('archive').classList.contains('on')) $('archive').classList.remove('on');
+        else if (els.about.classList.contains('on')) els.about.classList.remove('on');
         else if (onTitle) return;
         else showTitle();
       }
@@ -619,10 +732,13 @@
         SND.fx('click');
         if (m === 'start') startNew();
         if (m === 'continue') startContinue();
-          if (m === 'about') els.about.classList.add('on');
+        if (m === 'about') els.about.classList.add('on');
+        if (m === 'archive') openArchive();
       });
     });
     document.querySelector('.ab-close').addEventListener('click', () => { SND.fx('back'); els.about.classList.remove('on'); });
+    const arcClose = document.querySelector('.arc-close');
+    if (arcClose) arcClose.addEventListener('click', () => { SND.fx('back'); $('archive').classList.remove('on'); });
   }
 
   /* ---------------- 启动 ---------------- */
