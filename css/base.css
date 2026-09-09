@@ -628,9 +628,35 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
   .t-stripes{right:-20%;top:-26%;height:74%}
   .t-card{bottom:12%;max-width:64%}
 
-  /* 过场视频是 16:9：竖屏不裁画面，改成整帧显示，上下用模糊底图补满 */
-  #cutVideo{
-    object-fit:contain;
-    background:#000 url(../assets/video/cut01-fill.jpg) center/cover no-repeat;
+  /* 过场视频是 16:9：竖屏不裁画面，改成整帧显示，上下用同一支视频的模糊放大层补满，
+     再用一条紫线把画面框成「影格」，字幕/标签贴着画面走 */
+  #cutVideo{object-fit:contain;background:transparent}
+  .cut-bars i{height:0}
+  .cut-sub{bottom:20%}
+  .cut-tag{top:calc(50% - 28.125vw - 26px);left:6%;background:none;padding:0}
+  .cut-skip{bottom:6%}
+  #cutscene::after{
+    content:'';position:absolute;left:0;right:0;top:calc(50% - 28.125vw);height:1px;z-index:30;
+    background:linear-gradient(90deg,transparent,rgba(176,132,255,.8),transparent);
+    box-shadow:0 56.25vw 0 0 rgba(176,132,255,.5);
+    pointer-events:none;
   }
+}
+
+/* 竖屏补底层：默认不参与渲染，只有竖屏才亮。
+   视频播不动（iOS 限制同时解码路数）时退回同一帧的静帧底图，不会露黑边。 */
+.vfill{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:none;z-index:0;pointer-events:none;
+  filter:blur(30px) brightness(.4) saturate(1.15);
+  transform:scale(1.22);
+}
+#cutVideoBg{background:#05040a url(../assets/video/cut01-fill.jpg) center/cover no-repeat}
+#introVideoBg{background:#05040a url(../assets/video/intro-fill.jpg) center/cover no-repeat}
+@media (max-aspect-ratio:1/1){ .vfill{display:block} }
+
+/* 触屏设备没有键盘，标题页的 ↑↓ / ENTER / ESC 提示只占地方（iOS 还会把箭头渲染成彩色 emoji） */
+@media (hover:none){
+  .t-cmd{display:none}
+  .t-foot{bottom:2.4%}
 }

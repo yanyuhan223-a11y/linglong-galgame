@@ -183,6 +183,8 @@
 
   <!-- ========== 视频过场 ========== -->
   <div id="cutscene">
+    <!-- 竖屏补底：同一支视频的模糊放大层，只在竖屏出现 -->
+    <video id="cutVideoBg" class="vfill" muted playsinline preload="none" aria-hidden="true"></video>
     <video id="cutVideo" playsinline preload="auto"></video>
     <div class="cut-bars"><i></i><i></i></div>
     <div class="cut-sub" id="cutSub"></div>
@@ -195,6 +197,7 @@
 
   <!-- ========== 开场动画（OC 穿越 · 视频） ========== -->
   <div id="intro" aria-hidden="true">
+    <video id="introVideoBg" class="vfill" muted playsinline preload="none" aria-hidden="true"></video>
     <video id="introVideo" playsinline preload="auto" src="assets/video/intro.mp4"></video>
     <div class="in-grain"></div>
     <div class="in-vig"></div>
@@ -256,6 +259,7 @@
 </div>
 
 <script src="js/fx.js"></script>
+<script src="js/vfill.js"></script>
 <script src="js/intro.js"></script>
 <script src="js/rig.js"></script>
 <script src="js/explore.js"></script>

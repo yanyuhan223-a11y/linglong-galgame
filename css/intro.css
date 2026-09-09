@@ -448,12 +448,26 @@
 
 
 /* ============================================================
-   竖屏（移动端）：开场视频是 16:9，竖屏下不裁画面，
-   整帧居中显示，上下留白用视频自己的模糊底图补满。
+   竖屏（移动端）：开场视频是 16:9，竖屏下不裁画面，整帧居中显示，
+   上下留白由 #introVideoBg（同一支视频的模糊放大层，见 vfill.js）补满。
    ============================================================ */
 @media (max-aspect-ratio:1/1){
-  #introVideo{
-    object-fit:contain;
-    background:#000 url(../assets/video/intro-fill.jpg) center/cover no-repeat;
+  #introVideo{object-fit:contain;background:transparent;z-index:1}
+  /* 竖屏下画面只占中间一条，字幕跟着抬到画面正下方，别飘在空档里 */
+  .in-cap{bottom:22%}
+  .in-bars i{height:0}
+
+  /* 上下空档不当黑边处理，做成「影格」：一条紫色细线框住画面 + 一行片头标记 */
+  #intro::after{
+    content:'';position:absolute;left:0;right:0;top:calc(50% - 28.125vw);height:1px;z-index:30;
+    background:linear-gradient(90deg,transparent,rgba(176,132,255,.8),transparent);
+    box-shadow:0 56.25vw 0 0 rgba(176,132,255,.5);
+    pointer-events:none;
+  }
+  #intro::before{
+    content:'OPENING FILM ／ 开场影像';
+    position:absolute;left:6%;top:calc(50% - 28.125vw - 22px);z-index:30;
+    font-size:9px;font-weight:700;letter-spacing:.3em;color:rgba(255,255,255,.52);
+    pointer-events:none;
   }
 }
