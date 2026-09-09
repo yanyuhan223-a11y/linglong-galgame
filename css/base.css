@@ -37,6 +37,9 @@ button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer
 
 /* ============ 舞台 ============ */
 #stage{position:absolute;inset:0;overflow:hidden;background:#040407}
+/* 白光衔接期间把正片舞台整层藏死：白光散尽时只能露出第一视角，
+   不能闪出正片的空舞台和 Salt 立绘 */
+#stage.veil{opacity:0!important;visibility:hidden}
 
 /* ---- 背景 ---- */
 #bgLayer{position:absolute;inset:0;overflow:hidden}

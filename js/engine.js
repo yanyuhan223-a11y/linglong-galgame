@@ -34,6 +34,35 @@
     return window.SCRIPT.findIndex((n) => n.t === 'label' && n.v === name);
   }
 
+  /* ---------------- 白光衔接 ----------------
+     开场视频结尾那道白光是全屏最上层（#whiteout z-index:95）。
+     谁先在白光底下把画面铺好，白光就淡成谁 —— 绝不能在中间露出别的东西。 */
+  function veilStage(on) { if (els.stage) els.stage.classList.toggle('veil', !!on); }
+
+  function releaseWhiteout(delay) {
+    const wo = $('whiteout');
+    if (!wo || !wo.classList.contains('hold')) return false;
+    setTimeout(() => {
+      wo.classList.remove('hold');
+      wo.classList.add('fade');
+      setTimeout(() => wo.classList.remove('fade'), 1900);
+    }, delay || 0);
+    return true;
+  }
+
+  // 白光散尽后的"第一幕"是不是第一视角探索段？
+  // 只跨过 chap / flag / fx / hud / wait / label 这类不出画面的节点。
+  function firstExploreIdx(from) {
+    const pass = { chap: 1, flag: 1, fx: 1, hud: 1, wait: 1, label: 1 };
+    for (let k = from; k < window.SCRIPT.length; k++) {
+      const n = window.SCRIPT[k];
+      if (!n) break;
+      if (n.t === 'explore') return k;
+      if (!pass[n.t]) return -1;
+    }
+    return -1;
+  }
+
   /* ---------------- 背景切换（双层交叉溶解） ---------------- */
   let bgFlip = false;
   function setBg(name) {
@@ -239,8 +268,12 @@
         els.choices.classList.remove('on');
         els.ctrl.classList.remove('on');
         els.hud.classList.remove('on');
-        // 不去动 #whiteout：让开场那道白光自然淡尽，正好淡出成第一视角画面
-        if (window.Explore) await window.Explore.playInStory();
+        veilStage(true);                       // 正片舞台先藏好，白光散尽时不会露出正片第一幕
+        const ex = window.Explore ? window.Explore.playInStory() : Promise.resolve();
+        // 第一视角画面已经在白光底下铺好了 —— 现在才放白光走，白光直接淡成回廊
+        releaseWhiteout(220);
+        await ex;
+        veilStage(false);
         els.ctrl.classList.add('on');
         break;
       }
@@ -300,7 +333,7 @@
   async function endScreen() {
     els.dialogue.classList.remove('on');
     els.ctrl.classList.remove('on');
-    await window.FX.chapterCard('END', 'TO BE CONTINUED', '第一章 · 下降　完');
+    await window.FX.chapterCard('END', 'TO BE CONTINUED', '第 三 幕 · 异色　完');
     S.running = false;
     localStorage.removeItem(SAVE_KEY);
     showTitle();
@@ -341,6 +374,7 @@
   function showTitle() {
     clearTimers();
     S.running = false; S.typing = false; waiter = null;
+    veilStage(false);
     els.title.classList.remove('off');
     els.dialogue.classList.remove('on');
     els.choices.classList.remove('on');
@@ -387,9 +421,32 @@
       const j = findLabel(joinLabel);
       if (j >= 0) { primeUpTo(j); S.i = j; }
     }
-    // 正片场景已铺好，白光多停留一会，再带眩晕感淡出：游戏从刺眼白光里晃着浮现
     const wo = document.getElementById('whiteout');
-    if (wo && wo.classList.contains('hold')) {
+    const holding = !!(wo && wo.classList.contains('hold'));
+
+    /* 白光之后的第一幕就是第一视角探索段：
+       舞台整层藏起来（否则会闪一下正片的空画面 + Salt 立绘 —— 就是"一开始那幕快速闪过"），
+       静默把 chap / 粒子这类不出画面的节点铺好，直接跳到 explore 节点。
+       白光由 exec('explore') 在第一视角画面铺好之后才放走。 */
+    const exIdx = joinLabel ? -1 : firstExploreIdx(S.i);
+    if (exIdx >= 0) {
+      veilStage(true);
+      for (let k = S.i; k < exIdx; k++) {
+        const n = window.SCRIPT[k];
+        if (!n) continue;
+        if (n.t === 'chap') setChapter(n);
+        else if (n.t === 'flag') S.flags[n.k] = n.v;
+        else if (n.t === 'fx' && n.do === 'particles') window.FX.particles(n.arg);
+      }
+      els.hud.classList.remove('on');
+      S.i = exIdx;
+      await sleep(holding ? 90 : 0);
+      run();
+      return;
+    }
+
+    // 正片场景已铺好，白光多停留一会，再带眩晕感淡出：游戏从刺眼白光里晃着浮现
+    if (holding) {
       setTimeout(() => {
         if (els.stage) {
           els.stage.classList.remove('dizzy');
@@ -414,6 +471,7 @@
     const d = loadSave();
     if (!d) { toast('没有可用的存档'); return; }
     hideTitle();
+    veilStage(false);
     S.i = d.i; S.flags = d.flags || {};
     S.curBg = ''; setBg(d.bg || 'tower');
     setChar(d.char);

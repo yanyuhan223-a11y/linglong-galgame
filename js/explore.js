@@ -25,17 +25,16 @@
   var DEAD = 0.16;        // 摇杆死区
 
   /* ---------- 台词 ---------- */
-  // 开场：重点是"我被丢进了一个完全陌生的世界"，不是看手
+  // 白光后第一屏就先落在自己的第一视角手上，随后才意识到这里完全不是原来的世界。
   var MONO = [
-    { s: '', t: '白光散尽的时候，脚下已经不是自己房间的地板了。' },
-    { s: 'SALT', t: '……这是哪里？' },
-    { s: '', t: '一条望不到头的回廊。墙是铁的，地也是铁的，格栅缝里渗出一层青蓝色的冷光。' },
-    { s: '', t: '铁锈和消毒水混在一起的味道，冷得发苦。远处压着一阵低频的嗡鸣，像某种极大的机器从来没停过。' },
-    { s: 'SALT', t: '不是梦。梦不会这么冷，也不会有味道。' },
-    { s: '', t: '脚下的格栅在轻轻发抖——不是地震那种抖。是某种巨大的东西正托着这里，悬在半空。' },
-    { s: 'SALT', t: '我到底<em>穿到什么地方来了</em>……' },
-    { s: '', t: '你伸手扶住墙撑住自己。指缝间浮着一层很淡的光，随着呼吸一明一暗。', fx: 'glow' },
-    { s: 'SALT', t: '（……先找到出去的路。）' }
+    { s: '', t: '白光猛地一收，你最先看见的是自己抬在眼前的手。指尖发颤，掌心还残着一点没退干净的光。', fx: 'glow' },
+    { s: 'SALT', t: '……怎么回事？' },
+    { s: 'SALT', t: '我这是……在哪？' },
+    { s: '', t: '视线慢慢对上焦，一条望不到头的金属回廊从脚下一直延到黑里。墙是铁的，地也是铁的，格栅缝里渗着冷青色的光。' },
+    { s: '', t: '铁锈、机油和消毒水混在一起，冷得发苦。远处压着低低的嗡鸣，像某种庞大的机器从来没有停过。' },
+    { s: 'SALT', t: '不是梦……梦不会这么冷。' },
+    { s: '', t: '你扶住一旁的墙，逼自己先把呼吸压稳。这里陌生得过分，但继续站在原地只会更糟。' },
+    { s: 'SALT', t: '（先往前走。至少先找到人。）' }
   ];
 
   var RADIO = [
@@ -153,9 +152,7 @@
     HL.forEach(function (h) { html = html.replace(h[0], function (m) { return '<span class="' + h[1] + '">' + m + '</span>'; }); });
     els.capTxt.innerHTML = html;
     if (l.fx === 'glow' && els.hands) {
-      els.hands.classList.add('raise');
-      T(function () { els.hands.classList.add('sway'); }, 1500);
-      T(function () { els.hands.classList.add('glow'); }, 700);
+      els.hands.classList.add('glow');
     }
     if (l.s === '马克' && els.mkHead) {
       els.mkHead.classList.remove('nod');
@@ -209,8 +206,11 @@
     els.fpv.classList.remove('recover');
     if (recover) { void els.fpv.offsetWidth; els.fpv.classList.add('recover'); }
     els.hands.classList.remove('down', 'sway', 'glow', 'raise');
+    // 白光后第一眼就看到自己的手；不是到第几句才突然抬起来。
+    els.hands.classList.add('raise');
+    T(function () { els.hands.classList.add('sway'); }, recover ? 520 : 240);
     els.warpFlash.classList.remove('go');
-    T(function () { openCap(MONO, toWalk); }, recover ? 1900 : 1200);
+    T(function () { openCap(MONO, toWalk); }, recover ? 1480 : 980);
   }
 
   /* ---------- 2. 摇杆往前走 ---------- */
