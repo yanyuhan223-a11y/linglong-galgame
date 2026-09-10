@@ -9,7 +9,7 @@
   background:radial-gradient(58% 58% at 50% 46%,#fff,#fff 62%,#f2e9ff 100%);
   opacity:0;pointer-events:none;display:none;
 }
-#whiteout.hold{display:block;opacity:1}
+#whiteout.hold{display:block;opacity:1;pointer-events:auto}
 /* 驻留期间白光自己在"喘"：亮度起伏 + 极轻微漂移，配合耳鸣 */
 #whiteout.hold.pulse{animation:woBreathe 2.6s ease-in-out infinite}
 @keyframes woBreathe{
