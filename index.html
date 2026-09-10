@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="css/explore.css">
 <link rel="stylesheet" href="css/epilog.css">
 <link rel="stylesheet" href="css/branch.css">
+<link rel="stylesheet" href="css/dossier.css">
 </head>
 <body>
 
@@ -227,36 +228,128 @@
     <button class="in-skip" id="introSkip"><b>SKIP</b><span>跳过开场 ▸</span></button>
   </div>
 
-  <!-- ========== 标题画面 ========== -->
+  <!-- ========== 进场：马克 · 互动档案页（NEW GAME 入口） ========== -->
   <div id="title">
-    <div class="t-key"></div>
-    <div class="t-stripes"></div>
-    <div class="t-sweep"></div>
-    <div class="t-splat"></div>
+    <!-- 背景：地表 A-7 区废墟 -->
+    <div class="dz-bg"></div>
+    <div class="dz-grid"></div>
+    <div class="dz-scan"></div>
+    <div class="dz-vig"></div>
 
-    <div class="t-side"><b>VERTICAL SLICE 001</b><span>《灵笼》 FAN VISUAL NOVEL</span></div>
+    <!-- 顶栏：灯塔中枢终端状态 -->
+    <div class="dz-top">
+      <div class="dz-top-l"><i class="dot"></i><b>LIGHTHOUSE CENTRAL</b><span>人员档案终端</span></div>
+      <div class="dz-top-r">
+        <em>灯塔历 <b id="dzDate">0714</b></em>
+        <em>地表 <b>A-7</b></em>
+        <em>孢子 <b id="dzSpore">0.38</b> ppm</em>
+      </div>
+    </div>
 
-    <div class="t-copy">
-      <div class="t-sup">A LING CAGE FAN VISUAL NOVEL</div>
-      <h1 class="t-main"><span>笼中</span><em>异色</em></h1>
-      <div class="t-en">CHROMA IN THE CAGE</div>
+    <!-- 身份卡 -->
+    <div class="dz-id">
+      <div class="dz-face"><img src="assets/char/mark_head.png" alt=""><i class="dz-face-ring"></i></div>
+      <div class="dz-name">
+        <b>马克<em>MARK</em></b>
+        <span>猎荒者 · 第七小队 · 上尉</span>
+        <div class="dz-lv"><i>H-0714</i><u>权限 β</u><s id="dzTrustLv">熟识度 Lv.0</s></div>
+      </div>
+      <button class="dz-attr" id="dzAttrBtn"><b>角色属性</b><i>▸</i></button>
+    </div>
+
+    <!-- 右侧功能钮 -->
+    <ul class="dz-side">
+      <li data-dz="attr"><i>❖</i><span>属性</span></li>
+      <li data-dz="story"><i>❐</i><span>故事</span></li>
+      <li data-dz="archive"><i>✦</i><span>结局</span></li>
+      <li data-dz="about"><i>⚙</i><span>系统</span></li>
+    </ul>
+
+    <!-- 立绘舞台 -->
+    <div class="dz-stage">
+      <div class="dz-char" id="dzChar">
+        <i class="dz-glow"></i>
+        <img src="assets/char/mark.png" alt="马克">
+        <i class="dz-shadow"></i>
+      </div>
+      <div class="dz-tags"><i>#冷面</i><i>#守规矩</i><i>#护短</i><i>#枪不离手</i></div>
+    </div>
+
+    <!-- 台词气泡 -->
+    <div class="dz-talk" id="dzTalk">
+      <div class="dz-talk-who"><b>MARK</b><span>点一下，他会换一句</span></div>
+      <p id="dzLine">报上来历。给你一次机会。</p>
+      <i class="dz-talk-next">▸</i>
+    </div>
+
+    <!-- 进入游戏 -->
+    <div class="dz-enter">
+      <div class="dz-wordmark"><b>笼中异色</b><span>CHROMA IN THE CAGE · 第一幕 坠入</span></div>
       <ul class="t-menu">
-        <li data-menu="start"><i>01</i><b>NEW GAME</b><span>开始 · 第一幕</span></li>
-        <li data-menu="continue"><i>02</i><b>CONTINUE</b><span>继续 · 读取存档</span></li>
-        <li data-menu="archive"><i>03</i><b>ARCHIVE</b><span>结局档案 · <em id="endCount">0 / 3</em></span></li>
-        <li data-menu="about"><i>04</i><b>SYSTEM</b><span>关于这个 Demo</span></li>
+        <li class="main" data-menu="start">
+          <i>▶</i>
+          <div class="mtx"><b>进入马克的世界</b><span>NEW GAME · 以 Salt 的身份坠入 A-7 区</span></div>
+          <u>ENTER</u>
+        </li>
+        <li data-menu="continue"><i>02</i><b>CONTINUE</b><span>读取存档</span></li>
+        <li data-menu="archive"><i>03</i><b>ARCHIVE</b><span>结局 <em id="endCount">0 / 3</em></span></li>
+        <li data-menu="about"><i>04</i><b>SYSTEM</b><span>关于 Demo</span></li>
       </ul>
     </div>
 
-    <div class="t-card">
-      <div class="t-card-img"><img src="assets/oc/head_resolve.png" alt=""></div>
-      <div class="t-card-txt"><b>SALT</b><span>无档案者 / NO RECORD</span></div>
-    </div>
+    <div class="dz-foot">OC「Salt / 秋刀想吃鱼」 · 《灵笼》同人二创 · 角色版权归原方所有</div>
+  </div>
 
-    <div class="t-cmd">
-      <span><b>↑ ↓</b>选择</span><span><b>ENTER</b>确定</span><span><b>ESC</b>返回</span>
+  <!-- ========== 角色属性（灯塔人员档案） ========== -->
+  <div id="mprofile">
+    <div class="mp-inner">
+      <div class="mp-head">
+        <div class="mp-face"><img src="assets/char/mark_head.png" alt=""></div>
+        <div class="mp-title">
+          <b>马克 <em>MARK</em></b>
+          <span>灯塔中枢 · 人员档案 <i>H-0714</i></span>
+        </div>
+        <button class="mp-close" aria-label="关闭">✕</button>
+      </div>
+
+      <p class="mp-quote">「灯塔的规矩：不能有感情，不能有例外，不能有解释不清的东西。」</p>
+
+      <h3><b>01</b>认识他</h3>
+      <ul class="mp-know">
+        <li><i>身份</i><p>猎荒者，第七小队队长。下地面的次数比谁都多，回来的报告比谁都短。</p></li>
+        <li><i>日常</i><p>清点补给、校枪、把队员的名字一个个对上名册，然后写永远写不完的下降记录。</p></li>
+        <li><i>心愿</i><p>带下去几个人，就带回来几个人。名册上不要再多一行划掉的字。</p></li>
+        <li><i>穿着</i><p>猎荒者战术服，肩甲磨掉了漆。战术带上多挂一枚旧胸章——不是他的。</p></li>
+      </ul>
+
+      <h3><b>02</b>战术评估</h3>
+      <ul class="mp-bars">
+        <li><i>近身格斗</i><u data-v="82"></u><s>82</s></li>
+        <li><i>枪械精度</i><u data-v="91"></u><s>91</s></li>
+        <li><i>危险感知</i><u data-v="86"></u><s>86</s></li>
+        <li><i>小队统率</i><u data-v="78"></u><s>78</s></li>
+        <li><i>共情倾向</i><u data-v="24" class="warn"></u><s>24</s></li>
+      </ul>
+      <p class="mp-note">中枢备注：共情倾向低于阈值，适合执行清除任务。<br>
+        <b>——备注下方有人用笔加了一行：「这项评的不准。」</b></p>
+
+      <h3><b>03</b>他眼里的你</h3>
+      <p class="mp-live">这两项会随你在游戏里的选择变化。现在读的是你最近一次的进度。</p>
+      <ul class="mp-rel">
+        <li><i>马克 · 信任</i><u id="mpTrust"></u><s id="mpTrustV">0</s></li>
+        <li class="bad"><i>灯塔 · 关注度</i><u id="mpExpose"></u><s id="mpExposeV">0</s></li>
+      </ul>
+      <div class="mp-end">结局档案　<b id="mpEnd">0 / 3</b><span id="mpEndTxt">还没有人走到过第一章的尽头。</span></div>
+
+      <h3 id="mpStoryAnchor"><b>04</b>第一幕 · 坠入</h3>
+      <ol class="mp-story">
+        <li><i>01</i><div><b>坠落</b><p>你在自己的画室里画完最后一笔，画布裂开一道紫色的缝。醒来时，你躺在 A-7 区的地面上——灯塔的基因库里查不到你，屏幕上只有两个字：无档案。</p></div></li>
+        <li><i>02</i><div><b>遭遇</b><p>回廊尽头有个端着枪的人朝你走来。他没有立刻开火，只是要你报上来历。那是马克，第七小队的队长，也是这一章里唯一可能替你说话的人。</p></div></li>
+        <li><i>03</i><div><b>抉择</b><p>五次选择，改写两条线：<em>他对你的信任</em>，和<em>灯塔对「异色」的关注度</em>。名册、样本、无名——你会走到哪一个，取决于你怎么回答他。</p></div></li>
+      </ol>
+
+      <button class="mp-go" data-menu="start"><b>进入他的世界 ▸</b><span>NEW GAME</span></button>
     </div>
-    <div class="t-foot">OC「Salt / 秋刀想吃鱼」 · 同人二创 · 角色版权归原方所有</div>
   </div>
 
   <!-- ========== 关于 ========== -->
@@ -307,5 +400,6 @@
 <script src="js/epilog.js"></script>
 <script src="js/script.js"></script>
 <script src="js/engine.js"></script>
+<script src="js/dossier.js"></script>
 </body>
 </html>
