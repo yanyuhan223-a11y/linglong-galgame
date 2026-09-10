@@ -1,8 +1,9 @@
 /* ============================================================
-   dossier.js —— 进场：马克 · 互动档案页
-   · 立绘视差 + 点一下换一句台词（用已有贴图，不重绘）
-   · 角色属性面板：战术评估 / 他眼里的你（读存档）/ 第一幕梗概
-   · 侧栏功能钮复用 engine.js 已有的 .t-menu 逻辑，不改引擎
+   dossier.js —— 进场：马克 · 互动角色档案页
+   · 立绘视差 + 点一下换一句台词（用游戏内战术贴图，不重绘）
+   · 灯塔历 / 时段 / 孢子浓度 / 灯塔广播：把世界观读数跑起来
+   · 角色属性面板：认识他 / 战术评估 / 装备图鉴 / 世界观 / 关系（读档）/ 第一幕
+   · 侧栏与底部 tab 复用 engine.js 已有的 .t-menu 逻辑，不改引擎
    ============================================================ */
 (function () {
   'use strict';
@@ -10,7 +11,8 @@
   const title = $('title');
   if (!title) return;
 
-  const MAXV = 7;   // trust / expose 的第一章理论上限
+  const MAXV = 7;   // trust / expose 在第一章的理论上限
+  function snd(n) { try { if (window.Snd) window.Snd.sfx(n); } catch (e) { /* noop */ } }
 
   /* ---------------- 马克的台词池 ---------------- */
   const LINES = [
@@ -19,11 +21,13 @@
     '别往那边看。那不是风吹的。',
     '灯塔的规矩我背得比谁都熟。<span class="rd">背得熟，不代表我信。</span>',
     '第七小队，下去八个人。名册上现在只剩五行没被划掉。',
-    '手举高一点。不是我想为难你，是上面在看。',
+    '孢子过 0.6 就把面罩扣上。这条我不重复第二遍。',
     '你要是真没档案——那你现在最好别让任何人给你建一个。',
     '走在我后面半步。别问为什么，照做。',
     '我不管你叫什么。我只管带下去的人能不能带回来。',
-    '这枚胸章不是我的。别问。'
+    '这枚胸章不是我的。别问。',
+    '下降的时候不许跑，不许喊。它们不看眼睛，闻味道。',
+    '上面要一份报告，我只会写六个字：目标存在，撤离完成。'
   ];
   let li = 0;
   const lineEl = $('dzLine');
@@ -31,14 +35,13 @@
     li = (li + 1) % LINES.length;
     if (!lineEl) return;
     lineEl.style.opacity = '0';
-    lineEl.style.transform = 'translateY(4px)';
+    lineEl.style.transform = 'translateY(5px)';
     setTimeout(() => {
       lineEl.innerHTML = LINES[li];
-      lineEl.style.transition = 'opacity .26s ease, transform .26s ease';
       lineEl.style.opacity = '1';
       lineEl.style.transform = 'none';
-    }, 130);
-    if (window.Snd) { try { window.Snd.fx('hover'); } catch (e) { /* noop */ } }
+    }, 150);
+    snd('hover');
   }
   const talk = $('dzTalk');
   const charBox = $('dzChar');
@@ -56,29 +59,62 @@
   title.addEventListener('mousemove', (e) => {
     if (title.classList.contains('off')) return;
     const r = title.getBoundingClientRect();
-    px = ((e.clientX - r.left) / r.width - .5) * -16;
-    py = ((e.clientY - r.top) / r.height - .5) * -8;
+    px = ((e.clientX - r.left) / r.width - .5) * -14;
+    py = ((e.clientY - r.top) / r.height - .5) * -7;
     kick();
   });
   title.addEventListener('mouseleave', () => { px = 0; py = 0; kick(); });
   window.addEventListener('deviceorientation', (e) => {
     if (title.classList.contains('off') || e.gamma == null) return;
-    px = Math.max(-14, Math.min(14, e.gamma / 3)) * -1;
+    px = Math.max(-12, Math.min(12, e.gamma / 3)) * -1;
     py = Math.max(-6, Math.min(6, ((e.beta || 45) - 45) / 6)) * -1;
     kick();
   }, true);
 
-  /* ---------------- 顶栏读数（随机小抖动，像个活着的终端） ---------------- */
-  const spore = $('dzSpore');
-  const dzDate = $('dzDate');
-  if (dzDate) {
-    const d = new Date();
-    dzDate.textContent = String(4081 + d.getDate()).slice(-4);
+  /* ---------------- 世界读数：灯塔历 / 时段 / 孢子 ---------------- */
+  const PHASE = [
+    [0, '深夜'], [5, '破晓'], [8, '上行'], [11, '正午'],
+    [14, '下行'], [17, '黄昏'], [20, '闭塔']
+  ];
+  function phaseOf(h) {
+    let p = '深夜';
+    PHASE.forEach((x) => { if (h >= x[0]) p = x[1]; });
+    return p;
   }
+  function tickClock() {
+    const d = new Date();
+    const day = $('dzDay');
+    if (day) {
+      // 灯塔历 = 一个不动声色的长纪年，随真实日期缓慢推进
+      const base = Date.UTC(2026, 8, 10);   // 让「第 4,081 日」和剧本里的灯塔广播对上
+      const n = 4081 + Math.floor((d.getTime() - base) / 86400000);
+      day.textContent = n.toLocaleString('en-US');
+    }
+    const c = $('dzClock');
+    if (c) {
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      c.textContent = phaseOf(d.getHours()) + ' ' + hh + ':' + mm;
+    }
+  }
+  tickClock();
+  setInterval(tickClock, 20000);
+
+  const spore = $('dzSpore');
+  const quint = $('dzQuint');
   setInterval(() => {
-    if (!spore || title.classList.contains('off')) return;
-    spore.textContent = (0.30 + Math.random() * 0.18).toFixed(2);
-  }, 3200);
+    if (title.classList.contains('off')) return;
+    if (spore) spore.textContent = (0.30 + Math.random() * 0.2).toFixed(2);
+    if (quint) quint.textContent = (1180 + Math.floor(Math.random() * 60)).toLocaleString('en-US');
+  }, 3400);
+
+  /* 灯塔广播：直接用剧本里那条 */
+  const radio = $('dzRadio');
+  if (radio) {
+    const t = (window.TICKERS && window.TICKERS.calm) ||
+      '灯塔广播 · A-7 区例行净化完成 · 全体注意：不得私藏地面物品 · 不得有感情';
+    radio.textContent = t + '　　·　　' + t;
+  }
 
   /* ---------------- 属性面板 ---------------- */
   const panel = $('mprofile');
@@ -94,8 +130,8 @@
   }
   function n(v) { return typeof v === 'number' ? v : (parseFloat(v) || 0); }
 
-  function fillBars() {
-    // 伪元素宽度只能靠注入样式，统一在这里拼一份
+  function refresh() {
+    // 伪元素宽度只能靠注入样式，统一拼一份
     let css = '';
     document.querySelectorAll('.mp-bars u').forEach((u, i) => {
       u.dataset.i = i;
@@ -103,28 +139,31 @@
     });
 
     const f = readSave();
-    const t = Math.max(0, Math.min(MAXV, n(f.trust)));
-    const x = Math.max(0, Math.min(MAXV, n(f.expose)));
+    const tv = n(f.trust), xv = n(f.expose);
+    const t = Math.max(0, Math.min(MAXV, tv));
+    const x = Math.max(0, Math.min(MAXV, xv));
     css += '#mpTrust::after{width:' + (t / MAXV * 100).toFixed(1) + '%}';
     css += '#mpExpose::after{width:' + (x / MAXV * 100).toFixed(1) + '%}';
 
-    let tag = document.getElementById('dzBarCSS');
+    let tag = $('dzBarCSS');
     if (!tag) { tag = document.createElement('style'); tag.id = 'dzBarCSS'; document.head.appendChild(tag); }
     tag.textContent = css;
 
-    if ($('mpTrustV')) $('mpTrustV').textContent = n(f.trust);
-    if ($('mpExposeV')) $('mpExposeV').textContent = n(f.expose);
+    if ($('mpTrustV')) $('mpTrustV').textContent = tv;
+    if ($('mpExposeV')) $('mpExposeV').textContent = xv;
+    if ($('dzExpose')) $('dzExpose').textContent = xv;
 
-    const lv = $('dzTrustLv');
-    if (lv) {
-      const L = n(f.trust) >= 5 ? '并肩' : n(f.trust) >= 3 ? '有点信你' : n(f.trust) >= 1 ? '还在看' : '陌生人';
-      lv.textContent = '熟识度 ' + L;
-    }
+    // 身份胶囊上的熟识度
+    const lvl = tv >= 6 ? 4 : tv >= 4 ? 3 : tv >= 2 ? 2 : tv >= 1 ? 1 : 0;
+    const NAME = ['陌生人', '还在看你', '有点信你', '愿意担保', '并肩'];
+    if ($('dzTrustLv')) $('dzTrustLv').textContent = 'Lv.' + lvl + ' ' + NAME[lvl];
+    if ($('dzXp')) $('dzXp').style.width = (t / MAXV * 100).toFixed(1) + '%';
 
     const ends = readEnds();
     const all = window.ENDINGS ? Object.keys(window.ENDINGS) : ['roster', 'specimen', 'unnamed'];
     const got = all.filter((k) => ends[k]).length;
     if ($('mpEnd')) $('mpEnd').textContent = got + ' / ' + all.length;
+    if ($('endCount')) $('endCount').textContent = got + ' / ' + all.length;
     if ($('mpEndTxt')) {
       $('mpEndTxt').textContent = got === 0 ? '还没有人走到过第一章的尽头。'
         : got >= all.length ? '三条路你都走完了。他每一次都记得你。'
@@ -132,46 +171,52 @@
     }
   }
 
-  function openPanel(anchor) {
+  const ANCHOR = { attr: 'mpAttrAnchor', gear: 'mpGearAnchor', world: 'mpWorldAnchor', story: 'mpStoryAnchor' };
+  function openPanel(key) {
     if (!panel) return;
-    fillBars();
+    refresh();
     panel.classList.add('on');
     const inner = panel.querySelector('.mp-inner');
     if (inner) inner.scrollTop = 0;
-    if (anchor) {
-      const a = $(anchor);
-      if (a && inner) setTimeout(() => { inner.scrollTop = a.offsetTop - 12; }, 40);
+    const id = ANCHOR[key];
+    if (id && inner) {
+      const a = $(id);
+      if (a) setTimeout(() => { inner.scrollTo({ top: Math.max(0, a.offsetTop - 14), behavior: 'smooth' }); }, 60);
     }
-    if (window.Snd) { try { window.Snd.fx('click'); } catch (e) { /* noop */ } }
+    snd('click');
   }
   function closePanel() {
     if (!panel) return;
     panel.classList.remove('on');
-    if (window.Snd) { try { window.Snd.fx('back'); } catch (e) { /* noop */ } }
+    snd('back');
   }
 
   const attrBtn = $('dzAttrBtn');
-  if (attrBtn) attrBtn.addEventListener('click', () => openPanel());
+  if (attrBtn) attrBtn.addEventListener('click', () => openPanel('attr'));
+  const book = $('dzBook');
+  if (book) book.addEventListener('click', () => openPanel('attr'));
   const close = panel && panel.querySelector('.mp-close');
   if (close) close.addEventListener('click', closePanel);
   if (panel) panel.addEventListener('click', (e) => { if (e.target === panel) closePanel(); });
 
-  /* 侧栏：复用引擎已经绑好的 .t-menu 项，点它就等于点菜单 */
+  /* 侧栏 / 底部 tab：档案类自己处理，菜单类代理点原来的 .t-menu 项 */
   function proxyMenu(m) {
-    const li2 = document.querySelector('.t-menu li[data-menu="' + m + '"]');
-    if (li2 && !li2.classList.contains('dis')) li2.click();
+    const el = document.querySelector('.t-menu li[data-menu="' + m + '"]');
+    if (el && !el.classList.contains('dis')) el.click();
   }
-  document.querySelectorAll('.dz-side li').forEach((el) => {
+  function bindDz(el) {
     el.addEventListener('click', () => {
       const k = el.dataset.dz;
-      if (k === 'attr') openPanel();
-      else if (k === 'story') openPanel('mpStoryAnchor');
+      if (!k) return;
+      if (k === 'about') proxyMenu('about');
       else if (k === 'archive') proxyMenu('archive');
-      else if (k === 'about') proxyMenu('about');
+      else openPanel(k);          // attr / story / gear / world
     });
-  });
+  }
+  document.querySelectorAll('.dz-side li[data-dz], .dz-tabs li[data-dz]').forEach(bindDz);
+
   const go = panel && panel.querySelector('.mp-go');
-  if (go) go.addEventListener('click', () => { closePanel(); setTimeout(() => proxyMenu('start'), 120); });
+  if (go) go.addEventListener('click', () => { closePanel(); setTimeout(() => proxyMenu('start'), 130); });
 
   /* Esc / 方向键：面板打开时优先归面板处理 */
   document.addEventListener('keydown', (e) => {
@@ -181,9 +226,9 @@
   }, true);
 
   /* 回到标题页时刷新数值 */
-  const mo = new MutationObserver(() => { if (!title.classList.contains('off')) fillBars(); });
+  const mo = new MutationObserver(() => { if (!title.classList.contains('off')) refresh(); });
   mo.observe(title, { attributes: true, attributeFilter: ['class'] });
 
-  window.addEventListener('DOMContentLoaded', fillBars);
-  fillBars();
+  window.addEventListener('DOMContentLoaded', refresh);
+  refresh();
 })();
