@@ -230,13 +230,13 @@
 
   <!-- ========== 进场：马克 · 互动档案页（NEW GAME 入口） ========== -->
   <div id="title">
-    <!-- 背景：地表 A-7 区废墟 -->
+    <!-- 背景：地表废墟带 · 孢子伞林 -->
     <div class="dz-bg"></div>
-    <div class="dz-grid"></div>
+    <div class="dz-spore"></div>
     <div class="dz-scan"></div>
     <div class="dz-vig"></div>
 
-    <!-- 立绘舞台：游戏内战术贴图 -->
+    <!-- 立绘：游戏内战术贴图 -->
     <div class="dz-stage">
       <div class="dz-char" id="dzChar">
         <i class="dz-glow"></i>
@@ -245,75 +245,64 @@
       </div>
     </div>
 
-    <!-- ── 左上：身份胶囊 ── -->
+    <!-- ── 左上：身份卡 ── -->
     <div class="dz-card">
-      <div class="dz-card-row">
-        <div class="dz-face"><img src="assets/char/mark_body_head.png" alt=""><i class="dz-face-ring"></i></div>
-        <div class="dz-card-tx">
-          <b>马克<em>MARK</em></b>
-          <span>熟识度 <u id="dzTrustLv">Lv.0</u></span>
-          <i class="dz-xp"><u id="dzXp"></u></i>
-        </div>
+      <div class="dz-face">
+        <img src="assets/char/mark_body_head.png" alt="">
+        <svg class="dz-ring" viewBox="0 0 44 44"><circle class="tr" cx="22" cy="22" r="20"/><circle class="fg" id="dzRing" cx="22" cy="22" r="20"/></svg>
       </div>
-      <button class="dz-attr" id="dzAttrBtn">角色属性 <i>›</i></button>
+      <div class="dz-card-tx">
+        <b>马克</b>
+        <span>猎荒者队长 · 战备度 <u id="dzTrustLv">Lv.5</u></span>
+      </div>
     </div>
+    <button class="dz-attr" id="dzAttrBtn">角色属性 <i>›</i></button>
 
     <!-- ── 右上：世界读数 ── -->
     <div class="dz-res">
-      <div class="dz-res-p"><i class="ic q">◈</i><b id="dzQuint">1,204</b><span>源质</span></div>
+      <div class="dz-res-p"><i class="ic q">◈</i><b id="dzQuint">120</b></div>
       <div class="dz-res-p">
         <i class="ic s">☣</i><b id="dzSpore">0.38</b>
         <i class="ic e">⚠</i><b id="dzExpose">0</b>
       </div>
     </div>
 
-    <!-- ── 左上偏下：灯塔历 / 坐标 ── -->
+    <!-- ── 灯塔历 / 坐标 ── -->
     <div class="dz-when">
       <b>灯塔历 · 第 <em id="dzDay">4,081</em> 日</b>
-      <span id="dzClock">破晓 06:20</span>
-      <em class="dz-where">✧ 地表 A-7 区 · 三号回廊</em>
+      <span id="dzClock">黄昏 18:20</span>
+      <em class="dz-where">◇ 地表废墟带 · 孢子伞林</em>
     </div>
 
     <!-- ── 灯塔广播 ── -->
     <div class="dz-radio"><i>灯塔广播</i><div class="dz-radio-tk"><span id="dzRadio"></span></div></div>
 
-    <!-- ── 右侧竖排功能栏 ── -->
-    <ul class="dz-side">
-      <li data-dz="attr"><i>◉</i><span>角色属性</span></li>
-      <li data-dz="story"><i>▣</i><span>角色故事</span></li>
-      <li data-dz="gear"><i>✧</i><span>装备图鉴</span></li>
-      <li data-dz="world"><i>◈</i><span>世界观</span></li>
-      <li data-dz="about"><i>♫</i><span>设置</span></li>
-      <li data-dz="archive"><i>✦</i><span>结局名册</span></li>
+    <!-- ── 右侧圆形功能钮 ── -->
+    <ul class="t-menu dz-side">
+      <li data-dz="attr"><i>❖</i><span>属性</span></li>
+      <li data-dz="story"><i>❐</i><span>故事</span></li>
+      <li data-menu="archive"><i>✦</i><span>结局</span><em id="endCount">0 / 3</em></li>
+      <li data-menu="about"><i>⚙</i><span>系统</span></li>
     </ul>
 
-    <!-- ── 中下：他的台词（点一下换一句） ── -->
+    <!-- ── 他的台词（点一下换一句） ── -->
     <div class="dz-say" id="dzTalk">
-      <p id="dzLine">报上来历。给你一次机会。</p>
+      <p id="dzLine">名册上没你。但你这条命，我记下了。</p>
       <i class="dz-say-ic">曰</i>
     </div>
 
-    <!-- ── 引导 ── -->
-    <div class="dz-ask">
-      <em class="dz-wordmark">笼中异色 · CHROMA IN THE CAGE · 第一幕 坠入</em>
-      <b>今天，你想在这个世界里做什么？</b>
-      <span>点击「下降」，以 Salt 的身份走进他的世界</span>
-    </div>
-
-    <!-- ── 底部 tab：中间「下降」= NEW GAME ── -->
-    <ul class="t-menu dz-tabs">
-      <li data-dz="attr"><i>❖</i><b>档案</b></li>
-      <li data-menu="continue"><i>❐</i><b>续行</b></li>
-      <li class="main" data-menu="start"><i>▼</i><b>下降</b><u>DESCEND</u></li>
-      <li data-menu="archive"><i>✦</i><b>名册</b><em id="endCount">0 / 3</em></li>
-      <li data-menu="about"><i>⚙</i><b>系统</b></li>
+    <!-- ── 底部入口 ── -->
+    <ul class="t-menu dz-enter">
+      <li class="cont" data-menu="continue"><i>❐</i><b>继续上次的下降</b><span>CONTINUE</span></li>
+      <li class="main" data-menu="start">
+        <i class="pl">▶</i>
+        <div class="etx">
+          <b>进入马克的世界</b>
+          <span>NEW GAME · 以 Salt 的身份坠入 A-7 区</span>
+        </div>
+        <u>ENTER</u>
+      </li>
     </ul>
-
-    <!-- ── 最下露出一角的档案册 ── -->
-    <div class="dz-book" id="dzBook">
-      <span>灯塔中枢 · 人员档案 H-0714</span>
-      <b>角色属性</b>
-    </div>
   </div>
 
   <!-- ========== 角色属性（灯塔中枢 · 人员档案） ========== -->

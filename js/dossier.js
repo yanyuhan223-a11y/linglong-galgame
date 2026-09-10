@@ -16,6 +16,7 @@
 
   /* ---------------- 马克的台词池 ---------------- */
   const LINES = [
+    '名册上没你。但你这条命，我记下了。',
     '报上来历。给你一次机会。',
     '你身上没有编号，没有配给卡，连灰都不对。<span class="rd">你是从哪儿掉下来的？</span>',
     '别往那边看。那不是风吹的。',
@@ -105,7 +106,7 @@
   setInterval(() => {
     if (title.classList.contains('off')) return;
     if (spore) spore.textContent = (0.30 + Math.random() * 0.2).toFixed(2);
-    if (quint) quint.textContent = (1180 + Math.floor(Math.random() * 60)).toLocaleString('en-US');
+    if (quint) quint.textContent = 112 + Math.floor(Math.random() * 16);
   }, 3400);
 
   /* 灯塔广播：直接用剧本里那条 */
@@ -153,11 +154,16 @@
     if ($('mpExposeV')) $('mpExposeV').textContent = xv;
     if ($('dzExpose')) $('dzExpose').textContent = xv;
 
-    // 身份胶囊上的熟识度
-    const lvl = tv >= 6 ? 4 : tv >= 4 ? 3 : tv >= 2 ? 2 : tv >= 1 ? 1 : 0;
-    const NAME = ['陌生人', '还在看你', '有点信你', '愿意担保', '并肩'];
-    if ($('dzTrustLv')) $('dzTrustLv').textContent = 'Lv.' + lvl + ' ' + NAME[lvl];
-    if ($('dzXp')) $('dzXp').style.width = (t / MAXV * 100).toFixed(1) + '%';
+    // 身份卡：战备度 Lv.5 起步，随信任往上走；头像外圈的进度环同步
+    const lvl = 5 + (tv >= 6 ? 4 : tv >= 4 ? 3 : tv >= 2 ? 2 : tv >= 1 ? 1 : 0);
+    if ($('dzTrustLv')) $('dzTrustLv').textContent = 'Lv.' + lvl;
+    const ring = $('dzRing');
+    if (ring) {
+      const C = 2 * Math.PI * 20;
+      const ratio = 0.4 + (t / MAXV) * 0.6;      // 起手就有一段底，看得出是「战备度」
+      ring.style.strokeDasharray = C.toFixed(1);
+      ring.style.strokeDashoffset = (C * (1 - ratio)).toFixed(1);
+    }
 
     const ends = readEnds();
     const all = window.ENDINGS ? Object.keys(window.ENDINGS) : ['roster', 'specimen', 'unnamed'];
@@ -213,7 +219,7 @@
       else openPanel(k);          // attr / story / gear / world
     });
   }
-  document.querySelectorAll('.dz-side li[data-dz], .dz-tabs li[data-dz]').forEach(bindDz);
+  document.querySelectorAll('.dz-side li[data-dz]').forEach(bindDz);
 
   const go = panel && panel.querySelector('.mp-go');
   if (go) go.addEventListener('click', () => { closePanel(); setTimeout(() => proxyMenu('start'), 130); });
