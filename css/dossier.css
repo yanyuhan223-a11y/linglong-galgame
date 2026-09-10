@@ -25,6 +25,17 @@
 }
 #title::after{content:none}     /* 盖掉旧封面的紫色兜底色场 */
 
+/* 关键：入口页退场后必须彻底"死掉"。
+   #title.off 只写 pointer-events:none 是不够的——子元素里凡是自己声明了
+   pointer-events:auto（比如可点的立绘 .dz-char）都会重新抢回点击，
+   于是整场游戏的选项 / 按钮全被这层看不见的入口页吃掉。 */
+#title.off,
+#title.off *{pointer-events:none!important}
+#title.off{
+  visibility:hidden;
+  transition:opacity .6s ease,transform .6s ease,filter .6s ease,visibility 0s linear .62s;
+}
+
 /* 背景：地表废墟带 · 孢子伞林 */
 .dz-bg{
   position:absolute;inset:0;z-index:0;
@@ -72,37 +83,87 @@
     linear-gradient(180deg,rgba(2,8,8,.82) 0,rgba(2,8,8,.12) 18%,transparent 40%,rgba(2,8,8,.66) 76%,rgba(2,8,8,.95) 100%);
 }
 
-/* ============ 立绘 ============ */
+/* ============ 立绘：半身举枪 ============ */
 .dz-stage{position:absolute;inset:0;z-index:4;pointer-events:none}
 .dz-char{
   position:absolute;left:0;right:0;
-  bottom:calc(126px + var(--bot));
-  height:calc(100% - 254px);
+  bottom:calc(92px + var(--bot));
+  height:min(64%,660px);
   display:flex;align-items:flex-end;justify-content:center;
   pointer-events:auto;cursor:pointer;will-change:transform;
 }
+.dz-cwrap{position:relative;height:100%;display:flex;align-items:flex-end}
 .dz-char img{
-  height:100%;width:auto;max-width:96%;object-fit:contain;
-  filter:drop-shadow(0 0 26px rgba(255,138,61,.26)) drop-shadow(0 24px 46px rgba(0,0,0,.85)) contrast(1.05);
-  animation:dzBreath 5.4s ease-in-out infinite;
+  position:relative;z-index:1;
+  height:100%;width:auto;max-width:none;object-fit:contain;
+  /* 注意：这里不能配 mask-image。枪管是贴着图左边缘裁断的，
+     一旦加遮罩，drop-shadow 的橙色辉光会被遮罩盒子硬切出一条竖直缝。
+     腰部往下的收尾交给下面的 .dz-hem 暗场渐变。 */
+  /* 左边橙色枪火回光 + 右边青色环境回光（把人物"坐"进孢子林里），再压一层地面暗影 */
+  filter:drop-shadow(-14px 0 30px rgba(255,138,61,.34))
+         drop-shadow(16px -6px 18px rgba(95,224,192,.34))
+         drop-shadow(0 22px 44px rgba(0,0,0,.9))
+         contrast(1.07) saturate(1.04);
+  animation:dzAim 7s ease-in-out infinite;
 }
-@keyframes dzBreath{
-  0%,100%{transform:translateY(0) scale(1)}
-  50%    {transform:translateY(-.55%) scale(1.005)}
+/* 腰部以下压进暗场，半身像不会露出生硬的切口 */
+.dz-hem{
+  position:absolute;left:0;right:0;bottom:0;z-index:6;height:34%;
+  pointer-events:none;
+  background:linear-gradient(180deg,transparent 0,rgba(3,9,9,.5) 34%,rgba(3,9,9,.88) 66%,rgba(2,7,7,.97) 100%);
 }
-/* 脚下的橙色地光（对应天上那圈光柱） */
-.dz-glow{
-  position:absolute;left:50%;bottom:-4%;width:86%;height:26%;
+/* 压枪呼吸：极轻微的沉肩 + 前压，像在稳住准星 */
+@keyframes dzAim{
+  0%,100%{transform:translate3d(0,0,0) rotate(0)}
+  34%    {transform:translate3d(-.5%,-.5%,0) rotate(-.22deg)}
+  66%    {transform:translate3d(.35%,.25%,0) rotate(.16deg)}
+}
+/* 人物背后的橙色逆光，把黑甲从废墟里剥出来 */
+.dz-backlight{
+  position:absolute;z-index:0;left:50%;top:-4%;width:150%;height:118%;
   transform:translateX(-50%);pointer-events:none;
-  background:radial-gradient(50% 50% at 50% 50%,rgba(255,138,61,.4),rgba(255,138,61,.08) 58%,transparent 74%);
-  filter:blur(12px);animation:dzGlowP 4.6s ease-in-out infinite alternate;
+  background:radial-gradient(40% 36% at 52% 42%,rgba(255,138,61,.34),rgba(255,124,48,.09) 44%,transparent 64%);
+  animation:dzGlowP 4.6s ease-in-out infinite alternate;
 }
-@keyframes dzGlowP{from{opacity:.55}to{opacity:1}}
-.dz-shadow{
-  position:absolute;left:50%;bottom:0;width:48%;height:4%;
-  transform:translateX(-50%);pointer-events:none;
-  background:radial-gradient(50% 50% at 50% 50%,rgba(0,0,0,.85),transparent 70%);
-  filter:blur(6px);
+@keyframes dzGlowP{from{opacity:.6}to{opacity:1}}
+/* 枪口火光：不规律地跳，像点射 */
+.dz-muzzle{
+  position:absolute;z-index:2;left:-30%;top:13%;width:44%;aspect-ratio:1;
+  pointer-events:none;mix-blend-mode:screen;opacity:0;
+  background:
+    radial-gradient(28% 12% at 62% 50%,rgba(255,255,255,.95),rgba(255,214,140,.7) 42%,transparent 74%),
+    radial-gradient(50% 50% at 62% 50%,rgba(255,150,60,.6),transparent 70%);
+  filter:blur(2px);
+  animation:dzMuzzle 6.4s steps(1,end) infinite;
+}
+@keyframes dzMuzzle{
+  0%,7%,100%{opacity:0}
+  1%  {opacity:1}
+  2%  {opacity:.18}
+  3.2%{opacity:.92}
+  4.4%{opacity:.1}
+  5%  {opacity:.66}
+  6%  {opacity:0}
+}
+/* 交火余光：火光跳的时候整个画面左侧被照亮一下 */
+.dz-firelight{
+  position:absolute;inset:0;z-index:5;pointer-events:none;opacity:0;
+  background:radial-gradient(48% 34% at 6% 46%,rgba(255,168,92,.5),rgba(255,120,40,.14) 46%,transparent 72%);
+  mix-blend-mode:screen;
+  animation:dzFire 6.4s steps(1,end) infinite;
+}
+@keyframes dzFire{
+  0%,7%,100%{opacity:0}
+  1%  {opacity:.85}
+  2%  {opacity:.14}
+  3.2%{opacity:.7}
+  4.4%{opacity:.08}
+  5%  {opacity:.5}
+  6%  {opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .dz-muzzle,.dz-firelight,.dz-char img{animation:none}
+  .dz-muzzle{opacity:.5}
 }
 
 /* ============ 左上：身份卡 ============ */
@@ -215,8 +276,8 @@
 }
 .dz-side li em{
   position:absolute;right:-8px;top:-4px;font-style:normal;font-family:var(--mono);
-  font-size:7.4px;letter-spacing:0;padding:1px 4px;border-radius:999px;
-  background:rgba(255,138,61,.9);color:#160a04;
+  font-size:8.4px;font-weight:700;letter-spacing:0;padding:1.5px 5px;border-radius:999px;
+  background:var(--amber-l);color:#160a04;
   box-shadow:0 2px 8px rgba(0,0,0,.6);
 }
 .dz-side li:hover,.dz-side li.sel{
@@ -278,6 +339,11 @@
   border:1.5px solid var(--amber);
   box-shadow:0 0 30px rgba(255,138,61,.3),inset 0 0 24px rgba(255,138,61,.1);
   backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);transition:.2s;
+  animation:dzEnterBreathe 3.4s ease-in-out infinite;
+}
+@keyframes dzEnterBreathe{
+  0%,100%{box-shadow:0 0 24px rgba(255,138,61,.24),inset 0 0 22px rgba(255,138,61,.08)}
+  50%    {box-shadow:0 0 46px rgba(255,138,61,.5),inset 0 0 28px rgba(255,138,61,.16)}
 }
 .dz-enter li.main::before{
   content:"";position:absolute;inset:0;pointer-events:none;
@@ -464,7 +530,7 @@
   .dz-side li{width:54px;height:54px}
   .dz-side li i{font-size:20px}
   .dz-side li span{font-size:10.5px}
-  .dz-char{height:calc(100% - 232px);bottom:calc(120px + var(--bot))}
+  .dz-char{height:min(74%,780px);bottom:calc(88px + var(--bot))}
   .dz-say{bottom:calc(158px + var(--bot))}
   .dz-say p{font-size:17.5px}
   .t-menu.dz-enter{left:50%;right:auto;transform:translateX(-50%);width:620px;bottom:calc(30px + var(--bot))}
@@ -476,8 +542,14 @@
   .mp-story li{flex:1}
 }
 
+/* 竖屏留白：人物别顶到左上信息区 */
+@media (max-width:480px){
+  .dz-char{height:min(58%,600px)}
+}
+
 /* 小屏收紧 */
 @media (max-width:392px){
+  .dz-side{gap:27px}
   .dz-card{padding:5px 12px 5px 5px}
   .dz-face{width:42px;height:42px}
   .dz-card-tx b{font-size:15.5px}
@@ -504,3 +576,6 @@
 /* 覆盖 base.css 竖屏媒体查询里的 nowrap / 旧标题排版 */
 .t-menu li b,.t-menu li span{white-space:normal}
 .dz-enter li.main .etx b,.dz-enter li.cont b{white-space:nowrap}
+/* 右侧圆钮的中文标签必须单行：上面那条 .t-menu li span{white-space:normal}
+   会让它在 42px 宽的绝对定位盒里被折成一字一行，进而顶到上一枚钮的角标 */
+.dz-side li span{white-space:nowrap}

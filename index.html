@@ -125,8 +125,17 @@
           <div class="cor-l" id="exCor"></div>
           <div class="cor-fog"></div>
 
-          <!-- 纵深物件：手电照亮的墙面刻痕 -->
-          <div class="dep glyph" id="exGlyph"><span>✷</span></div>
+          <!-- 纵深物件：手电照亮的墙面刻痕（噬极兽爪痕）
+               用内联 SVG 画，别用 ✷ 之类的字符——苹果设备会把它渲染成一颗巨大的彩色 emoji 星，看着像贴图错误 -->
+          <div class="dep glyph" id="exGlyph">
+            <svg class="glyph-svg" viewBox="0 0 100 120" aria-hidden="true" fill="none">
+              <path d="M30 8 C40 40 44 74 40 110"/>
+              <path d="M50 4 C58 40 60 78 55 116"/>
+              <path d="M70 10 C74 42 72 76 66 108"/>
+              <path d="M22 52 L46 60"/>
+              <path d="M58 66 L80 72"/>
+            </svg>
+          </div>
 
           <!-- 纵深物件：马克全身（伪 Live2D） -->
           <div class="dep mk" id="exMark">
@@ -239,11 +248,15 @@
     <!-- 立绘：游戏内战术贴图 -->
     <div class="dz-stage">
       <div class="dz-char" id="dzChar">
-        <i class="dz-glow"></i>
-        <img src="assets/char/mark_body.png" alt="马克">
-        <i class="dz-shadow"></i>
+        <div class="dz-cwrap">
+          <i class="dz-backlight"></i>
+          <img src="assets/char/mark_aim.png" alt="马克">
+          <i class="dz-muzzle"></i>
+        </div>
       </div>
+      <i class="dz-hem"></i>
     </div>
+    <i class="dz-firelight" aria-hidden="true"></i>
 
     <!-- ── 左上：身份卡 ── -->
     <div class="dz-card">

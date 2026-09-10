@@ -96,10 +96,13 @@
   opacity:0;will-change:transform,height,bottom,opacity}
 .dep.mk{aspect-ratio:612/2096}
 
-/* 手电照亮的墙面刻痕 */
-.dep.glyph{align-items:center;justify-content:center;display:flex}
-.dep.glyph span{font-size:1em;line-height:1;color:rgba(120,120,140,.3);transition:.3s}
-.dep.glyph.lit span{color:#d8f6ff;text-shadow:0 0 18px rgba(34,211,238,.95),0 0 40px rgba(34,211,238,.6)}
+/* 手电照亮的墙面刻痕（噬极兽爪痕，内联 SVG，不用字符避免 emoji 化） */
+.dep.glyph{align-items:center;justify-content:center;display:flex;aspect-ratio:100/120}
+.glyph-svg{width:100%;height:100%;overflow:visible;
+  stroke:rgba(150,156,178,.32);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .3s,filter .3s}
+.dep.glyph.lit .glyph-svg{stroke:#d8f6ff;
+  filter:drop-shadow(0 0 9px rgba(34,211,238,.95)) drop-shadow(0 0 22px rgba(34,211,238,.55))}
 
 /* ---------- 马克：伪 Live2D 装置 ---------- */
 /* 落地接触阴影（不参与呼吸缩放，保证脚是"踩住"地面的） */
